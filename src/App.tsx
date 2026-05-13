@@ -758,6 +758,7 @@ function AboutTab() {
           <div className="space-y-4">
             <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400 space-y-2">
               <p>sudo nano /etc/systemd/system/vdar.service</p>
+              <p className="text-[9px] text-neutral-600 italic"># To save: Ctrl+O, Enter. To exit: Ctrl+X</p>
             </div>
             <p className="text-[10px] text-neutral-500 uppercase font-bold px-2">Paste this configuration:</p>
             <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[10px] font-mono text-neutral-500 leading-relaxed overflow-x-auto">
@@ -785,21 +786,49 @@ function AboutTab() {
 
       <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
         <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
+          <Terminal className="w-4 h-4 text-blue-500" />
+          Troubleshooting (If it doesn't show up)
+        </h3>
+        <div className="space-y-6">
+          <p className="text-sm text-neutral-400 leading-relaxed">
+            If the interface isn't loading at <code>http://[your-ip]:3000</code>, check the service status via SSH:
+          </p>
+          <div className="space-y-4">
+            <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400 space-y-2">
+              <p>sudo systemctl status vdar</p>
+              <p className="text-neutral-600 italic"># Check if it says "Active: active (running)"</p>
+            </div>
+            <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400 space-y-2">
+              <p>journalctl -u vdar -n 50 --no-pager</p>
+              <p className="text-neutral-600 italic"># See the last 50 lines of logs to find errors</p>
+            </div>
+          </div>
+          <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/10">
+             <h4 className="text-xs font-bold text-blue-400 uppercase mb-2">Common Fix: Wrong User</h4>
+             <p className="text-[11px] text-neutral-500">
+               If your username isn't <code>pi</code>, edit the service file (<code>sudo nano /etc/systemd/system/vdar.service</code>) and change <code>User=pi</code> and <code>WorkingDirectory=/home/pi/V-DAR</code> to match your actual user (e.g., <code>voron</code>).
+             </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
           <LayoutDashboard className="w-4 h-4 text-blue-500" />
           Klipper UI Integration (Mainsail/Fluidd)
         </h3>
         <div className="space-y-4">
           <p className="text-sm text-neutral-400 leading-relaxed">
-            To see V-DAR directly inside your printer interface, add it as an external link or iframe.
+            <b>Note:</b> V-DAR will appear as a new link in your <b>Sidebar</b>, not as a card on the main dashboard tab.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-4 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
               <h4 className="text-xs font-bold text-white mb-2 underline">Mainsail</h4>
-              <p className="text-[11px] text-neutral-500">Go to <b>Settings</b> &gt; <b>Interface</b> &gt; <b>External Links</b>. Add a link with URL <code>http://[printer-ip]:3000</code> and toggle "Open in Frame".</p>
+              <p className="text-[11px] text-neutral-500"><b>Settings</b> &gt; <b>Interface</b> &gt; <b>External Links</b>.<br/>Add Name: <code>V-DAR</code>, URL: <code>http://[printer-ip]:3000</code>. Toggle "Open in Frame". It will appear in the Sidebar.</p>
             </div>
             <div className="p-4 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
               <h4 className="text-xs font-bold text-white mb-2 underline">Fluidd</h4>
-              <p className="text-[11px] text-neutral-500">Go to <b>Settings</b> &gt; <b>External Links</b>. Add <code>http://[printer-ip]:3000</code>. Fluidd will show it in the sidebar.</p>
+              <p className="text-[11px] text-neutral-500"><b>Settings</b> &gt; <b>External Links</b>.<br/>Add <code>http://[printer-ip]:3000</code>. It will appear at the bottom of the sidebar.</p>
             </div>
           </div>
         </div>

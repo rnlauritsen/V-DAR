@@ -56,6 +56,7 @@ To ensure V-DAR starts automatically on your printer controller:
 1. Create a service file:
    ```bash
    sudo nano /etc/systemd/system/vdar.service
+   # In nano: Paste content, then press Ctrl+O, Enter to save, and Ctrl+X to exit.
    ```
 2. Paste the following (adjust `User` and `WorkingDirectory` if your username is not `pi`):
    ```ini
@@ -82,8 +83,17 @@ To ensure V-DAR starts automatically on your printer controller:
 ## Klipper UI Integration
 To access V-DAR within your printer's web interface:
 
-- **Mainsail:** Settings -> Interface -> External Links -> Add `http://[printer-ip]:3000` (Enable "Open in Frame").
-- **Fluidd:** Settings -> External Links -> Add `http://[printer-ip]:3000`.
+- **Mainsail:** Settings -> Interface -> External Links -> Add `http://[printer-ip]:3000` (Enable "Open in Frame"). It will appear as a link in the **Sidebar**.
+- **Fluidd:** Settings -> External Links -> Add `http://[printer-ip]:3000`. It will appear in the **Sidebar**.
+
+**Note:** It will not automatically appear as a card/widget on your dashboard. You must click the new link in your sidebar.
+
+## Troubleshooting
+If the interface doesn't load at `http://[your-ip]:3000`:
+1. Check the service status: `sudo systemctl status vdar`.
+2. Check logs: `journalctl -u vdar -n 50 --no-pager`.
+3. If your username isn't `pi`, update the `User` and `WorkingDirectory` in `/etc/systemd/system/vdar.service`.
+4. Ensure your printer's firewall isn't blocking port 3000.
 
 ## Hardware Setup
 1. Mount your 5mW line laser and endoscope to the toolhead.
