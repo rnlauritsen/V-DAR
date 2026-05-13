@@ -1,0 +1,12 @@
+{
+  "name": "V-DAR",
+  "description": "The Voron LIDAR system. Automatic flowrate and pressure advance calibration using a line laser and endoscope camera.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "AI-powered Calibration",
+    "Real-time Printer Monitoring",
+    "G-code Integration"
+  ]
+}
