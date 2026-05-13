@@ -43,15 +43,54 @@ const SidebarItem = ({ icon: Icon, label, active, onClick }: { icon: any, label:
   <button
     onClick={onClick}
     className={cn(
-      "flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 group",
+      "flex items-center gap-3 px-4 py-3 w-full rounded transition-all duration-200 group",
       active 
-        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" 
-        : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
+        ? "bg-klipper-blue text-white shadow-lg shadow-klipper-blue/20" 
+        : "text-klipper-subtext hover:bg-neutral-800 hover:text-white"
     )}
   >
-    <Icon className={cn("w-5 h-5", active ? "text-white" : "group-hover:text-blue-400")} />
-    <span className="font-medium text-sm">{label}</span>
+    <Icon className={cn("w-5 h-5", active ? "text-white" : "group-hover:text-klipper-blue")} />
+    <span className="font-medium text-sm hidden md:block">{label}</span>
   </button>
+);
+
+// Klipper Styled Components
+const KlipperCard = ({ title, icon: Icon, children, className }: { title: string, icon?: any, children: React.ReactNode, className?: string }) => (
+  <div className={cn("bg-klipper-card border border-klipper-border rounded shadow-lg overflow-hidden", className)}>
+    <div className="flex items-center justify-between px-4 py-2 border-b border-klipper-border">
+      <div className="flex items-center gap-3">
+        {Icon && <Icon className="w-4 h-4 text-klipper-subtext" />}
+        <h3 className="text-base font-medium text-klipper-text">{title}</h3>
+      </div>
+      <div className="flex items-center gap-2">
+        <button className="p-1 hover:bg-neutral-700/50 rounded text-klipper-subtext"><Settings className="w-4 h-4" /></button>
+        <button className="p-1 hover:bg-neutral-700/50 rounded text-klipper-subtext transition-transform"><ChevronRight className="w-4 h-4 rotate-90" /></button>
+      </div>
+    </div>
+    <div className="p-4 bg-[#1e1e1e]">
+      {children}
+    </div>
+  </div>
+);
+
+const KlipperInput = ({ label, value, unit, onChange }: { label: string, value: string | number, unit?: string, onChange?: (v: string) => void }) => (
+  <div className="relative group">
+    <div className="absolute -top-2.5 left-2 px-1 bg-[#1e1e1e] text-[10px] font-medium text-klipper-subtext group-focus-within:text-klipper-blue transition-colors">
+      {label}
+    </div>
+    <div className="flex items-center border border-klipper-border rounded focus-within:border-klipper-blue transition-colors overflow-hidden">
+      <input 
+        value={value}
+        onChange={e => onChange?.(e.target.value)}
+        className="w-full bg-[#121212] px-3 py-2 text-sm text-klipper-text outline-none text-right"
+      />
+      {unit && <span className="px-3 text-xs text-klipper-subtext border-l border-klipper-border bg-[#121212] py-2">{unit}</span>}
+      <div className="flex flex-col border-l border-klipper-border">
+        <button className="px-1 hover:bg-neutral-700/50 border-b border-klipper-border"><ChevronRight className="w-3 h-3 -rotate-90 text-klipper-subtext" /></button>
+        <button className="px-1 hover:bg-neutral-700/50"><ChevronRight className="w-3 h-3 rotate-90 text-klipper-subtext" /></button>
+      </div>
+    </div>
+  </div>
 );
 
 export default function App() {
@@ -110,20 +149,20 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-neutral-950 text-neutral-100 font-sans selection:bg-blue-500/30">
+    <div className="flex h-screen bg-klipper-bg text-klipper-text font-sans selection:bg-klipper-blue/30">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-neutral-800 flex flex-col p-6 bg-neutral-900/50 backdrop-blur-xl">
-        <div className="flex items-center gap-2 mb-10 px-2">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-            <Zap className="w-6 h-6 text-white" />
+      <aside className="w-16 md:w-56 border-r border-klipper-border flex flex-col bg-klipper-card">
+        <div className="flex items-center gap-2 p-4 md:p-6 mb-4">
+          <div className="w-8 h-8 rounded bg-klipper-blue flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <h1 className="font-bold tracking-tight text-lg leading-tight text-white">V-DAR</h1>
-            <p className="text-[10px] uppercase tracking-wider text-neutral-500 font-bold">Klipper Studio</p>
+          <div className="hidden md:block">
+            <h1 className="font-bold tracking-tight text-base leading-tight text-white uppercase">V-DAR</h1>
+            <p className="text-[10px] uppercase tracking-wider text-klipper-subtext font-bold">LIDAR Interface</p>
           </div>
         </div>
 
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 px-2 space-y-1">
           <SidebarItem 
             icon={LayoutDashboard} 
             label="Dashboard" 
@@ -148,61 +187,47 @@ export default function App() {
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
           />
-          <SidebarItem 
-            icon={Info} 
-            label="About V-DAR" 
-            active={activeTab === 'about'} 
-            onClick={() => setActiveTab('about')} 
-          />
         </nav>
 
         {/* Connection Widget */}
-        <div className="mt-auto pt-6 border-t border-neutral-800">
-          <div className="bg-neutral-800/50 rounded-2xl p-4 border border-neutral-700/50">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-neutral-400">Connection</span>
-              <div className={cn(
-                "w-2 h-2 rounded-full",
-                printer.status === 'connected' ? "bg-green-500 animate-pulse" : 
-                printer.status === 'connecting' ? "bg-yellow-500 animate-bounce" : "bg-red-500"
-              )} />
-            </div>
-            <p className="text-sm font-mono truncate text-neutral-300 mb-4">{printer.hostname}</p>
-            <button
-              onClick={toggleConnection}
-              className={cn(
-                "w-full py-2 rounded-lg text-xs font-bold transition-all",
-                printer.status === 'connected' 
-                  ? "bg-neutral-700 text-neutral-300 hover:bg-neutral-600" 
-                  : "bg-blue-600 text-white hover:bg-blue-500"
-              )}
-            >
-              {printer.status === 'connected' ? 'Disconnect' : printer.status === 'connecting' ? 'Connecting...' : 'Connect Printer'}
-            </button>
-          </div>
+        <div className="p-4 border-t border-klipper-border">
+          <button
+            onClick={toggleConnection}
+            className={cn(
+              "w-full py-2 rounded text-[10px] font-bold uppercase tracking-wider transition-all",
+              printer.status === 'connected' 
+                ? "bg-neutral-800 text-klipper-subtext hover:bg-neutral-700" 
+                : "bg-klipper-blue text-white hover:opacity-90"
+            )}
+          >
+            {printer.status === 'connected' ? 'Connected' : 'Connect'}
+          </button>
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto relative">
-        <header className="sticky top-0 z-30 flex items-center justify-between px-10 py-6 bg-neutral-950/80 backdrop-blur-md">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight first-letter:uppercase">{activeTab}</h2>
-            <p className="text-sm text-neutral-500">Monitor and calibrate your LIDAR sensor.</p>
+        <header className="sticky top-0 z-30 flex items-center justify-between px-6 md:px-10 py-4 bg-klipper-bg/90 backdrop-blur-md border-b border-klipper-border">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-medium text-white first-letter:uppercase">{activeTab}</h2>
+            <div className={cn(
+                "w-2 h-2 rounded-full",
+                printer.status === 'connected' ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-red-500"
+              )} />
           </div>
-          <div className="flex gap-4">
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] uppercase text-neutral-500 font-bold">Extruder</span>
-              <span className="font-mono font-medium">{printer.extruderTemperature}°C</span>
+          <div className="flex gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase text-klipper-subtext font-bold">Extruder</span>
+              <span className="font-mono text-sm text-klipper-text">{printer.extruderTemperature}°C</span>
             </div>
-            <div className="flex flex-col items-end border-l border-neutral-800 pl-4">
-              <span className="text-[10px] uppercase text-neutral-500 font-bold">Bed</span>
-              <span className="font-mono font-medium">{printer.bedTemperature}°C</span>
+            <div className="flex items-center gap-2 border-l border-klipper-border pl-6">
+              <span className="text-[10px] uppercase text-klipper-subtext font-bold">Bed</span>
+              <span className="font-mono text-sm text-klipper-text">{printer.bedTemperature}°C</span>
             </div>
           </div>
         </header>
 
-        <div className="px-10 pb-10">
+        <div className="p-6 md:p-10">
           <AnimatePresence mode="wait">
             {activeTab === 'dashboard' && <DashboardTab printer={printer} setFilament={setFilament} config={config} />}
             {activeTab === 'camera' && <CameraTab config={config} />}
@@ -217,112 +242,104 @@ export default function App() {
 }
 
 function DashboardTab({ printer, setFilament, config }: { printer: PrinterState, setFilament: (t: string) => void, config: LidarConfig }) {
-  const filaments = [
-    { name: 'PLA', temp: 210, bed: 60 },
-    { name: 'ABS', temp: 250, bed: 110 },
-    { name: 'PETG', temp: 240, bed: 80 },
-    { name: 'PP', temp: 220, bed: 100 },
-  ];
-
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="grid grid-cols-3 gap-6"
+      exit={{ opacity: 0, y: -10 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-6"
     >
-      <div className="col-span-2 bg-neutral-900 border border-neutral-800 rounded-3xl p-8 overflow-hidden relative group">
-        <div className="absolute top-0 right-0 p-8 opacity-20 transform translate-x-10 -translate-y-10 group-hover:translate-x-5 transition-transform duration-700">
-          <Zap className="w-64 h-64 text-blue-500" />
-        </div>
-        <div className="relative z-10">
-          <span className="inline-block px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 border border-blue-500/20">
-            System Status
-          </span>
-          <h3 className="text-4xl font-bold mb-4 tracking-tight leading-tight max-w-md">
-            V-DAR Engine for Voron 2.4 is {printer.status === 'connected' ? 'Ready' : 'Standby'}.
-          </h3>
-          <p className="text-neutral-400 max-w-lg mb-8 leading-relaxed">
-            V-DAR is an open-source LIDAR system. It uses a line laser and endoscope to measure extrusion profiles, achieving Bambu Lab-like flow calibration on any Klipper machine.
-          </p>
+      <KlipperCard title="LIDAR Tuner" icon={Activity}>
+        <div className="space-y-6">
+          {/* Extrusion Factor Style Row */}
+          <div className="space-y-4">
+             <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-medium text-klipper-subtext">
+                   <Activity className="w-3.5 h-3.5" />
+                   Calibration Factor
+                </div>
+                <div className="flex items-center gap-2 border border-klipper-border rounded px-2 bg-klipper-input">
+                   <span className="text-sm font-mono text-white">100</span>
+                   <span className="text-[10px] text-klipper-subtext">%</span>
+                </div>
+             </div>
+             <div className="flex items-center gap-4">
+                <span className="text-klipper-subtext font-bold">−</span>
+                <input type="range" className="flex-1" readOnly value={100} />
+                <span className="text-klipper-subtext font-bold text-lg">+</span>
+             </div>
+          </div>
 
-          <div className="mb-8">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-3 block">Selected Material</label>
-            <div className="flex gap-2">
-              {filaments.map(f => (
-                <button
-                  key={f.name}
-                  onClick={() => setFilament(f.name)}
-                  className={cn(
-                    "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
-                    config.selectedFilament === f.name 
-                      ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20" 
-                      : "bg-neutral-800 border-neutral-700 text-neutral-400 hover:text-white"
-                  )}
-                >
-                  {f.name}
-                </button>
-              ))}
+          <div className="border-t border-klipper-border pt-6">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+               <KlipperInput label="Pressure Advance" value="0.04" unit="s" />
+               <KlipperInput label="Smooth Time" value="0.04" unit="s" />
+               <KlipperInput label="Filament Length" value={config.calibrationLength} unit="mm" />
+               <KlipperInput label="Extrusion Feedrate" value="10" unit="mm/s" />
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <button className="px-6 py-3 bg-blue-600 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20">
-              <Play className="w-4 h-4 fill-white" />
-              Quick Scan
-            </button>
-            <div className="px-6 py-3 bg-neutral-800 rounded-xl font-bold flex items-center gap-2 border border-neutral-700">
-              <div className={cn("w-2 h-2 rounded-full", printer.isHomed ? "bg-green-500" : "bg-red-500 animate-pulse")} />
-              <span className="text-sm">{printer.isHomed ? 'Printer Homed' : 'Homing Required'}</span>
-            </div>
+          <div className="flex gap-2">
+             {[50, 25, 10, 5, 1].map(v => (
+               <button key={v} className="flex-1 bg-klipper-input border border-klipper-border py-1.5 rounded text-xs text-klipper-subtext hover:text-white transition-colors">
+                 {v}
+               </button>
+             ))}
+          </div>
+
+          <div className="flex gap-4 pt-2">
+             <button className="flex-1 bg-neutral-800 border border-klipper-border py-3 rounded text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-neutral-700 transition-colors">
+                <ChevronRight className="w-4 h-4 -rotate-90" />
+                Retract
+             </button>
+             <button className="flex-1 bg-neutral-800 border border-klipper-border py-3 rounded text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-neutral-700 transition-colors">
+                <ChevronRight className="w-4 h-4 rotate-90" />
+                Extrude
+             </button>
+          </div>
+
+          <div className="text-center">
+             <p className="text-[10px] text-klipper-subtext italic">
+                Extrusion: ~ 213 mm @ 24.1 mm³/s - ⌀ 0.6 mm
+             </p>
           </div>
         </div>
-      </div>
+      </KlipperCard>
 
       <div className="space-y-6">
-        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-4 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-blue-500" />
-            Active Profiles
-          </h4>
-          <div className="space-y-3">
-            {[
-              { name: 'eSUN PLA+', color: 'bg-green-500', flow: 0.98, pa: 0.045 },
-              { name: 'Prusament PETG', color: 'bg-orange-500', flow: 1.02, pa: 0.082 },
-              { name: 'Polymaker ABS', color: 'bg-blue-500', flow: 1.035, pa: 0.055 },
-            ].map((f, i) => (
-              <div key={i} className="group flex items-center justify-between p-4 rounded-2xl bg-neutral-800/30 border border-neutral-700/30 hover:border-blue-500/50 transition-all cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className={cn("w-3 h-3 rounded-full shadow-lg", f.color)} />
-                  <div>
-                    <p className="text-sm font-bold group-hover:text-white transition-colors">{f.name}</p>
-                    <p className="text-[10px] font-mono text-neutral-500">Flow: {f.flow} | PA: {f.pa}</p>
-                  </div>
-                </div>
-                <Settings className="w-4 h-4 text-neutral-600 group-hover:text-blue-400 transition-colors" />
-              </div>
+        <KlipperCard title="Material Selection" icon={Zap}>
+          <div className="grid grid-cols-2 gap-2">
+            {['PLA', 'ABS', 'PETG', 'PP'].map(f => (
+              <button
+                key={f}
+                onClick={() => setFilament(f)}
+                className={cn(
+                  "px-4 py-3 rounded text-xs font-bold transition-all border",
+                  config.selectedFilament === f 
+                    ? "bg-klipper-blue border-klipper-blue text-white" 
+                    : "bg-klipper-input border-klipper-border text-klipper-subtext hover:text-white"
+                )}
+              >
+                {f}
+              </button>
             ))}
           </div>
-          <button className="w-full mt-4 py-3 bg-neutral-800 text-neutral-400 text-xs font-bold rounded-xl border border-dashed border-neutral-700 hover:border-neutral-500 hover:text-neutral-200 transition-all">
-            + New Filament Profile
-          </button>
-        </div>
+        </KlipperCard>
 
-        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-4 flex items-center gap-2">
-            <History className="w-4 h-4" />
-            Latest Scan Results
-          </h4>
-          <div className="flex items-center justify-between p-3 rounded-xl bg-green-500/5 border border-green-500/10">
-            <div>
-              <p className="text-xs font-bold text-green-400">Ladder Scan: ABS_Black</p>
-              <p className="text-[10px] text-neutral-500">Sub-pixel Confidence: 98.4%</p>
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4 text-green-500" />
-            </div>
-          </div>
-        </div>
+        <KlipperCard title="Latest Analysis" icon={History}>
+           <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-klipper-input rounded border border-klipper-border">
+                 <div>
+                    <p className="text-xs font-bold text-green-400">Scan Optimized: {config.selectedFilament}</p>
+                    <p className="text-[10px] text-klipper-subtext">Peak Flow Offset: +2.4%</p>
+                 </div>
+                 <CheckCircle2 className="w-4 h-4 text-green-500" />
+              </div>
+              <button className="w-full py-3 bg-klipper-blue text-white rounded text-xs font-bold uppercase tracking-widest hover:opacity-90">
+                 Apply All Offsets
+              </button>
+           </div>
+        </KlipperCard>
       </div>
     </motion.div>
   );
@@ -576,7 +593,7 @@ gcode:
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Laser Pinout (Fan)</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Laser Pinout (Fan Slot)</label>
               <input 
                 value={config.laserPin}
                 onChange={e => setConfig({...config, laserPin: e.target.value})}
@@ -655,9 +672,24 @@ gcode:
              <div className="p-3 bg-black rounded-lg border border-neutral-800 mb-4 text-[10px] font-mono text-green-400">
                ls /dev/v4l/by-id/
              </div>
-             <p className="text-[10px] text-neutral-500 italic">
+             <p className="text-[10px] text-neutral-500 italic mb-6">
                Select the path ending in <code>-video-index0</code>. This path is persistent and won't change if you unplug other cameras.
              </p>
+
+             <div className="pt-6 border-t border-neutral-800 space-y-4">
+                <div className="flex items-center gap-2 text-blue-500">
+                   <Zap className="w-3 h-3" />
+                   <h5 className="text-[10px] font-bold uppercase tracking-widest">Klipper Snippet</h5>
+                </div>
+                <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[10px] font-mono text-neutral-400 leading-relaxed">
+                  {`[output_pin lidar_laser]
+pin: ${config.laserPin}
+value: 0
+
+[gcode_macro LIDAR_ON]
+gcode: SET_PIN PIN=lidar_laser VALUE=1`}
+                </div>
+             </div>
         </div>
 
         <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
