@@ -1,3 +1,5 @@
+- - - still under development! - - - 
+
 # V-DAR: Voron LIDAR System
 
 V-DAR is a sub-pixel accurate LIDAR calibration system for Klipper-based 3D printers (optimized for Voron 2.4). It uses a standard line laser and UVC endoscope to automate flowrate and pressure advance calibration.
