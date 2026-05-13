@@ -768,8 +768,8 @@ function AboutTab() {
               <br/>
               [Service]<br/>
               Type=simple<br/>
-              User=pi<br/>
-              WorkingDirectory=/home/pi/V-DAR<br/>
+              User=admin<br/>
+              WorkingDirectory=/home/admin/V-DAR<br/>
               ExecStart=/usr/bin/npm run dev<br/>
               Restart=always<br/>
               <br/>
@@ -784,53 +784,135 @@ function AboutTab() {
         </div>
       </div>
 
-      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-red-500/5">
         <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-blue-500" />
-          Troubleshooting (If it doesn't show up)
+          <Terminal className="w-4 h-4 text-red-500" />
+          Fixing Service Errors
+        </h3>
+        <div className="space-y-6 text-sm text-neutral-400 leading-relaxed">
+          <div className="space-y-4">
+            <div className="p-4 bg-black/40 rounded-xl border border-red-500/20">
+               <h4 className="text-[10px] font-bold text-red-400 uppercase mb-2">1. "Assignment outside of section" Error</h4>
+               <p className="text-[11px] mb-2">This means the <b>[Unit]</b> or <b>[Service]</b> headers are missing or misspelled. Your file must look EXACTLY like this (including the brackets):</p>
+               <div className="p-3 bg-black rounded font-mono text-[10px] text-neutral-500">
+                  <span className="text-white">[Unit]</span><br/>
+                  Description=V-DAR...<br/>
+                  <br/>
+                  <span className="text-white">[Service]</span><br/>
+                  User=admin<br/>
+                  ...
+               </div>
+            </div>
+
+            <div className="p-4 bg-black/40 rounded-xl border border-red-500/20">
+               <h4 className="text-[10px] font-bold text-red-400 uppercase mb-2">2. "status=200/CHDIR" Error</h4>
+               <p className="text-[11px] mb-2">The service can't find the folder. Since your user is <b>admin</b>, use these paths:</p>
+               <div className="p-3 bg-black rounded font-mono text-[10px] text-blue-400">
+                  User=admin<br/>
+                  WorkingDirectory=/home/admin/V-DAR
+               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-neutral-500 uppercase">3. Apply & Restart</label>
+              <div className="p-4 bg-black rounded-lg border border-neutral-800 font-mono text-blue-400 space-y-1 text-[11px]">
+                <p>sudo systemctl daemon-reload</p>
+                <p>sudo systemctl restart vdar</p>
+                <p>sudo systemctl status vdar</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-orange-500/5">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-orange-400 mb-6 flex items-center gap-2">
+          <Zap className="w-4 h-4" />
+          Hardware & Klipper Config
         </h3>
         <div className="space-y-6">
           <p className="text-sm text-neutral-400 leading-relaxed">
-            If the interface isn't loading at <code>http://[your-ip]:3000</code>, check the service status via SSH:
+            To "enable" the laser and movement, you must add these sections to your <code className="text-white">printer.cfg</code> file:
           </p>
+          
           <div className="space-y-4">
-            <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400 space-y-2">
-              <p>sudo systemctl status vdar</p>
-              <p className="text-neutral-600 italic"># Check if it says "Active: active (running)"</p>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-neutral-500 uppercase">1. Laser Control (Fan Port)</label>
+              <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[10px] font-mono text-neutral-400 leading-relaxed overflow-x-auto">
+                [output_pin vdar_laser]<br/>
+                pin: !PC1 <span className="text-neutral-600"># Change to your Fan Pin</span><br/>
+                pwm: true<br/>
+                value: 0<br/>
+                shutdown_value: 0
+              </div>
             </div>
-            <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400 space-y-2">
-              <p>journalctl -u vdar -n 50 --no-pager</p>
-              <p className="text-neutral-600 italic"># See the last 50 lines of logs to find errors</p>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-neutral-500 uppercase">2. Scan Trigger Macro</label>
+              <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[10px] font-mono text-neutral-400 leading-relaxed overflow-x-auto">
+                [gcode_macro V_DAR_SCAN]<br/>
+                gcode:<br/>
+                &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=1<br/>
+                &nbsp;&nbsp;M117 Scanning...<br/>
+                &nbsp;&nbsp;<span className="text-neutral-600"># Your scan path code here</span><br/>
+                &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=0
+              </div>
             </div>
           </div>
-          <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/10">
-             <h4 className="text-xs font-bold text-blue-400 uppercase mb-2">Common Fix: Wrong User</h4>
-             <p className="text-[11px] text-neutral-500">
-               If your username isn't <code>pi</code>, edit the service file (<code>sudo nano /etc/systemd/system/vdar.service</code>) and change <code>User=pi</code> and <code>WorkingDirectory=/home/pi/V-DAR</code> to match your actual user (e.g., <code>voron</code>).
+        </div>
+      </div>
+
+      <div className="bg-green-500/10 border border-green-500/20 rounded-3xl p-8">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-green-400 mb-6 flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4" />
+          Installation Success!
+        </h3>
+        <div className="space-y-4 text-sm text-neutral-400">
+          <p>Your V-DAR service is verified as <b>Active (running)</b>. You can now access this UI from any device on your network.</p>
+          <div className="p-4 bg-black/40 rounded-xl border border-green-500/20 font-mono text-[11px] text-green-500">
+            URL: http://[your-printer-ip]:3000
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-blue-500/5">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
+          <LayoutDashboard className="w-4 h-4 text-blue-500" />
+          Mainsail: Still can't see "External Links"?
+        </h3>
+        <div className="space-y-6">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+             <h4 className="text-xs font-bold text-red-400 uppercase mb-2">Check Expert Mode</h4>
+             <p className="text-[11px] text-neutral-400">
+               Some settings are hidden in Standard mode. Look for a <b className="text-white">toggle or switch</b> in the Settings header or bottom corner that says "Expert Mode" or "Advanced" and turn it on.
              </p>
+          </div>
+
+          <div className="space-y-4 text-sm text-neutral-400">
+            <p>Based on your screenshots, check <b className="text-white">NAVIGATION</b> or <b className="text-white">MISCELLANEOUS</b>:</p>
+            <div className="p-5 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
+              <ol className="text-[11px] text-neutral-500 space-y-3 list-decimal ml-4">
+                <li>Click <b className="text-white">NAVIGATION</b> or <b className="text-white font-mono">DASHBOARD</b> in the list on the left.</li>
+                <li>Scroll the right panel <b className="text-white">completely to the bottom</b>.</li>
+                <li>If it's not there, try <b className="text-white font-mono">MISCELLANEOUS</b>.</li>
+                <li>If you still can't find it, your Mainsail version might be too old—please use the <b className="text-blue-400 underline">IP address:3000</b> in a new tab.</li>
+              </ol>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
         <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
-          <LayoutDashboard className="w-4 h-4 text-blue-500" />
-          Klipper UI Integration (Mainsail/Fluidd)
+          <Terminal className="w-4 h-4 text-blue-500" />
+          Verify the Port is Open
         </h3>
-        <div className="space-y-4">
-          <p className="text-sm text-neutral-400 leading-relaxed">
-            <b>Note:</b> V-DAR will appear as a new link in your <b>Sidebar</b>, not as a card on the main dashboard tab.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
-              <h4 className="text-xs font-bold text-white mb-2 underline">Mainsail</h4>
-              <p className="text-[11px] text-neutral-500"><b>Settings</b> &gt; <b>Interface</b> &gt; <b>External Links</b>.<br/>Add Name: <code>V-DAR</code>, URL: <code>http://[printer-ip]:3000</code>. Toggle "Open in Frame". It will appear in the Sidebar.</p>
-            </div>
-            <div className="p-4 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
-              <h4 className="text-xs font-bold text-white mb-2 underline">Fluidd</h4>
-              <p className="text-[11px] text-neutral-500"><b>Settings</b> &gt; <b>External Links</b>.<br/>Add <code>http://[printer-ip]:3000</code>. It will appear at the bottom of the sidebar.</p>
-            </div>
+        <div className="space-y-6 text-sm text-neutral-400 leading-relaxed">
+          <p>If you can't reach the page at all, run this in SSH to ensure the server is listening for outside connections:</p>
+          <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400">
+            <p>netstat -tulpn | grep :3000</p>
           </div>
+          <p>It should show <code className="text-white">0.0.0.0:3000</code> or <code className="text-white">*:3000</code>. If it says <code className="text-white">127.0.0.1:3000</code>, the app is locked to the printer only and you won't be able to see it from your PC.</p>
         </div>
       </div>
       <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 relative overflow-hidden group">
