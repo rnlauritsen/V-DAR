@@ -767,6 +767,42 @@ function AboutTab() {
           </div>
         </div>
       </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
+          <Terminal className="w-4 h-4 text-blue-500" />
+          CLI Installation Guide
+        </h3>
+        <div className="space-y-6">
+          <p className="text-sm text-neutral-400 leading-relaxed">
+            To install V-DAR directly on your Raspberry Pi or printer controller, use the standard Git/NPM workflow. First, use the <b>Export to GitHub</b> feature in AI Studio, then run:
+          </p>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-neutral-600 uppercase tracking-widest">1. Clone & Enter</label>
+              <div className="p-4 bg-black rounded-xl border border-neutral-800 font-mono text-xs text-blue-400 flex justify-between items-center group">
+                <code>git clone https://github.com/runelaurtsen/V-DAR.git && cd V-DAR</code>
+                <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-neutral-600 uppercase tracking-widest">2. Install & Start</label>
+              <div className="p-4 bg-black rounded-xl border border-neutral-800 font-mono text-xs text-blue-400 flex justify-between items-center group">
+                <code>npm install && npm run dev</code>
+                <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
+              </div>
+            </div>
+          </div>
+          <div className="p-4 bg-yellow-500/5 rounded-xl border border-yellow-500/10 flex gap-3">
+             <div className="shrink-0 mt-0.5">
+               <Info className="w-4 h-4 text-yellow-500/50" />
+             </div>
+             <p className="text-[11px] text-neutral-500 leading-relaxed">
+               <b>Note:</b> You must first push this project to your own GitHub repository using the Export menu in the top right of this editor. Replace the URL above with your repository's URL.
+             </p>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }

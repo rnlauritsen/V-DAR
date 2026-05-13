@@ -1,20 +1,45 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# V-DAR: Voron LIDAR System
 
-# Run and deploy your AI Studio app
+V-DAR is a sub-pixel accurate LIDAR calibration system for Klipper-based 3D printers (optimized for Voron 2.4). It uses a standard line laser and UVC endoscope to automate flowrate and pressure advance calibration.
 
-This contains everything you need to run your app locally.
+## Features
+- **Ladder Scans:** Calibrate entire flow ranges in a single pass.
+- **Sub-pixel Engine:** Compensates for low-resolution optics and slight misalignments.
+- **Offline First:** All processing happens locally on your printer's controller.
+- **V-DAR Studio:** A polished web interface for managing calibrations and profiles.
 
-View your app in AI Studio: https://ai.studio/apps/3d24eedf-79e1-428c-baef-1106e8d611a8
+## Installation
 
-## Run Locally
+### 1. Requirements
+- Node.js (v18+)
+- Python 3 with OpenCV (for the backend engine)
+- Klipper/Moonraker access
 
-**Prerequisites:**  Node.js
+### 2. Clone the Repository
+Once you have exported this project from AI Studio to your own GitHub, run:
 
+```bash
+git clone https://github.com/YOUR_USERNAME/V-DAR.git
+cd V-DAR
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 3. Install Dependencies
+```bash
+npm install
+```
+
+### 4. Run the Interface
+```bash
+npm run dev
+```
+
+The interface will be available at `http://localhost:3000`.
+
+## Hardware Setup
+1. Mount your 5mW line laser and endoscope to the toolhead.
+2. Connect the laser to a controllable fan port (e.g., `FAN1`).
+3. Identify your camera ID using `ls /dev/v4l/by-id/`.
+4. Configure the offsets in the V-DAR Studio settings tab.
+
+## Credits
+Based on the V-DAR open-source initiative. Developed as a standalone Klipper integration.
