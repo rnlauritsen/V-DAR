@@ -187,6 +187,12 @@ export default function App() {
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
           />
+          <SidebarItem 
+            icon={Info} 
+            label="Help" 
+            active={activeTab === 'about'} 
+            onClick={() => setActiveTab('about')} 
+          />
         </nav>
 
         {/* Connection Widget */}
@@ -740,6 +746,64 @@ function AboutTab() {
       exit={{ opacity: 0, y: -20 }}
       className="max-w-4xl space-y-8"
     >
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
+          <Zap className="w-4 h-4 text-blue-500" />
+          Auto-Start on Boot (Daemon)
+        </h3>
+        <div className="space-y-6">
+          <p className="text-sm text-neutral-400 leading-relaxed">
+            To ensure V-DAR starts automatically when your printer turns on, create a systemd service:
+          </p>
+          <div className="space-y-4">
+            <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400 space-y-2">
+              <p>sudo nano /etc/systemd/system/vdar.service</p>
+            </div>
+            <p className="text-[10px] text-neutral-500 uppercase font-bold px-2">Paste this configuration:</p>
+            <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[10px] font-mono text-neutral-500 leading-relaxed overflow-x-auto">
+              [Unit]<br/>
+              Description=V-DAR LIDAR Studio<br/>
+              After=network.target<br/>
+              <br/>
+              [Service]<br/>
+              Type=simple<br/>
+              User=pi<br/>
+              WorkingDirectory=/home/pi/V-DAR<br/>
+              ExecStart=/usr/bin/npm run dev<br/>
+              Restart=always<br/>
+              <br/>
+              [Install]<br/>
+              WantedBy=multi-user.target
+            </div>
+            <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] font-mono text-blue-400 space-y-2">
+              <p>sudo systemctl enable vdar</p>
+              <p>sudo systemctl start vdar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
+          <LayoutDashboard className="w-4 h-4 text-blue-500" />
+          Klipper UI Integration (Mainsail/Fluidd)
+        </h3>
+        <div className="space-y-4">
+          <p className="text-sm text-neutral-400 leading-relaxed">
+            To see V-DAR directly inside your printer interface, add it as an external link or iframe.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-4 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
+              <h4 className="text-xs font-bold text-white mb-2 underline">Mainsail</h4>
+              <p className="text-[11px] text-neutral-500">Go to <b>Settings</b> &gt; <b>Interface</b> &gt; <b>External Links</b>. Add a link with URL <code>http://[printer-ip]:3000</code> and toggle "Open in Frame".</p>
+            </div>
+            <div className="p-4 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
+              <h4 className="text-xs font-bold text-white mb-2 underline">Fluidd</h4>
+              <p className="text-[11px] text-neutral-500">Go to <b>Settings</b> &gt; <b>External Links</b>. Add <code>http://[printer-ip]:3000</code>. Fluidd will show it in the sidebar.</p>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 relative overflow-hidden group">
         <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-10 -translate-y-10 group-hover:translate-x-5 transition-transform duration-700">
           <Github className="w-64 h-64 text-white" />
@@ -795,6 +859,34 @@ function AboutTab() {
             </p>
             <div className="p-3 bg-blue-500/5 rounded-xl border border-blue-500/10 text-[11px] font-mono">
               v1.0.4 - Standalone Package Edition
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
+          <Terminal className="w-4 h-4 text-blue-500" />
+          Update & Maintenance
+        </h3>
+        <div className="space-y-6">
+          <p className="text-sm text-neutral-400 leading-relaxed">
+            When you make changes in AI Studio, you need to push them to GitHub and then pull them to your machine via SSH.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">1. In AI Studio</label>
+              <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] text-neutral-400">
+                Click <b>Settings</b> &gt; <b>Export to GitHub</b>. Choose your repository and click <b>Push Changes</b>.
+              </div>
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">2. In SSH Terminal</label>
+              <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[11px] text-neutral-400 font-mono space-y-2">
+                <p>cd ~/V-DAR</p>
+                <p>git pull</p>
+                <p>npm install</p>
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,3 @@
-- - - still under development! - - - 
-
 # V-DAR: Voron LIDAR System
 
 V-DAR is a sub-pixel accurate LIDAR calibration system for Klipper-based 3D printers (optimized for Voron 2.4). It uses a standard line laser and UVC endoscope to automate flowrate and pressure advance calibration.
@@ -39,6 +37,53 @@ npm run dev
 ```
 
 The interface will be available at `http://localhost:3000`.
+
+## Updating V-DAR
+To update your installation after making changes in the AI Studio editor:
+
+1. In AI Studio, click **Settings** (gear icon) -> **Export to GitHub**.
+2. Select your repository and push the latest changes.
+3. SSH into your printer controller and run:
+   ```bash
+   cd ~/V-DAR
+   git pull
+   npm install
+   ```
+
+## Auto-Start on Boot (Daemon)
+To ensure V-DAR starts automatically on your printer controller:
+
+1. Create a service file:
+   ```bash
+   sudo nano /etc/systemd/system/vdar.service
+   ```
+2. Paste the following (adjust `User` and `WorkingDirectory` if your username is not `pi`):
+   ```ini
+   [Unit]
+   Description=V-DAR LIDAR Studio
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=pi
+   WorkingDirectory=/home/pi/V-DAR
+   ExecStart=/usr/bin/npm run dev
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+3. Enable and start:
+   ```bash
+   sudo systemctl enable vdar
+   sudo systemctl start vdar
+   ```
+
+## Klipper UI Integration
+To access V-DAR within your printer's web interface:
+
+- **Mainsail:** Settings -> Interface -> External Links -> Add `http://[printer-ip]:3000` (Enable "Open in Frame").
+- **Fluidd:** Settings -> External Links -> Add `http://[printer-ip]:3000`.
 
 ## Hardware Setup
 1. Mount your 5mW line laser and endoscope to the toolhead.
