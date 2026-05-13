@@ -10,10 +10,13 @@ V-DAR is a sub-pixel accurate LIDAR calibration system for Klipper-based 3D prin
 
 ## Installation
 
-### 1. Requirements
-- Node.js (v18+)
-- Python 3 with OpenCV (for the backend engine)
-- Klipper/Moonraker access
+### 1. Requirements (Prerequisites)
+If you get a `command not found` error for `npm`, run these commands first to install Node.js:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
 
 ### 2. Clone the Repository
 Once you have exported this project from AI Studio to your own GitHub, run:

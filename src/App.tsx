@@ -778,6 +778,12 @@ function AboutTab() {
             To install V-DAR directly on your Raspberry Pi or printer controller, use the standard Git/NPM workflow. First, use the <b>Export to GitHub</b> feature in AI Studio, then run:
           </p>
           <div className="space-y-4">
+            <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/10 space-y-2">
+              <label className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">0. Install Node.js (If missing)</label>
+              <div className="p-3 bg-black rounded-lg font-mono text-[10px] text-neutral-400">
+                curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt install -y nodejs
+              </div>
+            </div>
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-neutral-600 uppercase tracking-widest">1. Clone & Enter</label>
               <div className="p-4 bg-black rounded-xl border border-neutral-800 font-mono text-xs text-blue-400 flex justify-between items-center group">
