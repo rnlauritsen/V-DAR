@@ -115,10 +115,12 @@ To ensure V-DAR starts automatically on your printer controller:
 V-DAR can now save its results directly to a file (`variables.cfg`) so they aren't lost when you restart or power cycle. This allows your `PRINT_START` macro to automatically load and apply the calibration.
 
 1. **Setup Storage:** Add `[save_variables]` to your config as shown in the **Klipper Macros** tab.
-2. **Auto-Load:** Update your `PRINT_START` macro to include the loaded variable:
+2. **Auto-Load:** Update your `PRINT_START` macro. The logic **must** be inside the `gcode:` block and indented:
    ```gcode
-   {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
-   SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
+   [gcode_macro PRINT_START]
+   gcode:
+       {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
+       SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
    ```
 
 ## Macro-First Workflow (KlipperScreen & OctoEverywhere)

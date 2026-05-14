@@ -41,8 +41,18 @@ gcode:
     M117 V-DAR: Scan Done
 
 # 5. INTEGRATION IN PRINT_START
-# Add these lines to your PRINT_START macro to auto-apply the last scan:
+# Replace your existing PRINT_START macro logic with this:
 #
-# {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
-# SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
-# M117 V-DAR: Applied {vdar_o} offset
+[gcode_macro PRINT_START]
+gcode:
+    # 1. Load the calibration value from disk
+    {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
+    
+    # 2. Apply it (This must be done BEFORE or DURING the print start)
+    # Using Z_ADJUST adds the value to your existing offset
+    SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
+    
+    M117 V-DAR: Applied {vdar_o} offset
+    
+    # ... Rest of your macro (Homing, Heating, etc.) ...
+    G28

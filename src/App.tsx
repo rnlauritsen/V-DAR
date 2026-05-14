@@ -761,9 +761,19 @@ gcode:
     V_DAR_SET_OFFSET VALUE=0.042 # Example value found during scan
 
 # --- PRINT START INTEGRATION ---
-# Add this line to your PRINT_START macro:
-# {% set vdar_offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
-# SET_GCODE_OFFSET Z_ADJUST={vdar_offset} MOVE=1`;
+# Replace your existing [gcode_macro PRINT_START] with this logic:
+[gcode_macro PRINT_START]
+gcode:
+    # 1. Load V-DAR Offset
+    {% set vdar_offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
+    
+    # 2. Apply it (This happens before or during homing/leveling)
+    SET_GCODE_OFFSET Z_ADJUST={vdar_offset} MOVE=1
+    M117 V-DAR: Applied {vdar_offset} offset
+    
+    # 3. Rest of your print start (G28, BED_MESH, etc)
+    G28
+    ...`;
 
   return (
     <motion.div 
@@ -804,10 +814,12 @@ gcode:
              </div>
              <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
                 <h4 className="text-xs font-bold text-green-400 uppercase mb-3">2. Print Start Auto-Load</h4>
-                <p className="text-[10px] text-neutral-500 mb-2">Add this inside your <code className="text-white">PRINT_START</code> macro:</p>
+                <p className="text-[10px] text-neutral-500 mb-2">Code must be <b>inside</b> the gcode: section and indented!</p>
                 <div className="p-3 bg-black rounded font-mono text-[9px] text-neutral-600 leading-relaxed italic">
-                  &#123;% set offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %&#125;<br/>
-                  SET_GCODE_OFFSET Z_ADJUST=&#123;offset&#125; MOVE=1
+                  [gcode_macro PRINT_START]<br/>
+                  gcode:<br/>
+                  &nbsp;&nbsp;&#123;% set offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %&#125;<br/>
+                  &nbsp;&nbsp;SET_GCODE_OFFSET Z_ADJUST=&#123;offset&#125; MOVE=1
                 </div>
              </div>
           </div>
