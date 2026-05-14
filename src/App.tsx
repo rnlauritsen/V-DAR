@@ -740,24 +740,30 @@ gcode: SET_PIN PIN=lidar_laser VALUE=1`}
 
 function MacrosTab() {
   const macrosText = `#####################################################################
-# V-DAR: Material-Specific Macros
+# V-DAR: Smart Persistence & CNC-Style Variables
 #####################################################################
 
-[gcode_macro V_DAR_ABS]
-description: Runs high-temp ABS calibration
-gcode:
-    V_DAR_SCAN MATERIAL="ABS"
+[save_variables]
+filename: ~/printer_data/config/variables.cfg # Stores data across reboots
 
-[gcode_macro V_DAR_PLA]
-description: Runs standard PLA calibration
+[gcode_macro V_DAR_SET_OFFSET]
+description: Permanently saves the current calibration value
 gcode:
-    V_DAR_SCAN MATERIAL="PLA"
+    {% set VAL = params.VALUE|default(0.0)|float %}
+    SAVE_VARIABLE VARIABLE=vdar_last_offset VALUE={VAL}
+    M118 V-DAR: Offset {VAL} saved to variables.cfg
 
 [gcode_macro V_DAR_SCAN]
 gcode:
     {% set MAT = params.MATERIAL|default("PLA") %}
     M117 V-DAR: {MAT} Scanning...
-    # ... Laser movement ...`;
+    # ... Laser movement ...
+    V_DAR_SET_OFFSET VALUE=0.042 # Example value found during scan
+
+# --- PRINT START INTEGRATION ---
+# Add this line to your PRINT_START macro:
+# {% set vdar_offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
+# SET_GCODE_OFFSET Z_ADJUST={vdar_offset} MOVE=1`;
 
   return (
     <motion.div 
@@ -784,31 +790,30 @@ gcode:
 
         <div className="space-y-6">
           <p className="text-sm text-neutral-400 leading-relaxed italic">
-            "We've shifted to a macro-first workflow. This ensures V-DAR works perfectly on klipper screen, OctoEverywhere, and older Mainsail versions by bypassing the browser UI entirely."
+            "We've shifted to a macro-first workflow with <b>Smart Persistence</b>. This ensures V-DAR works like a CNC probe: it saves information to a file, which Klipper then loads automatically at the start of every print."
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
-                <h4 className="text-xs font-bold text-blue-400 uppercase mb-3">1. Add the Laser Pin</h4>
+                <h4 className="text-xs font-bold text-blue-400 uppercase mb-3">1. Enable Storage</h4>
+                <p className="text-[10px] text-neutral-500 mb-2">Add this to enable the "Hard Drive" for your variables:</p>
                 <div className="p-3 bg-black rounded font-mono text-[10px] text-neutral-500 leading-relaxed shadow-inner">
-                  [output_pin vdar_laser]<br/>
-                  pin: !PC1 <span className="text-neutral-700"># Change to yours</span><br/>
-                  pwm: true
+                  [save_variables]<br/>
+                  filename: ~/printer_data/config/variables.cfg
                 </div>
              </div>
              <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
-                <h4 className="text-xs font-bold text-green-400 uppercase mb-3">2. Choose Your Filament</h4>
-                <p className="text-[10px] text-neutral-500 mb-2">Once added, you can click these on your printer screen:</p>
-                <div className="flex flex-wrap gap-2">
-                   <div className="px-2 py-1 bg-neutral-800 rounded font-mono text-[9px] text-white">V_DAR_PLA</div>
-                   <div className="px-2 py-1 bg-neutral-800 rounded font-mono text-[9px] text-white">V_DAR_ABS</div>
-                   <div className="px-2 py-1 bg-neutral-800 rounded font-mono text-[9px] text-white">V_DAR_PETG</div>
+                <h4 className="text-xs font-bold text-green-400 uppercase mb-3">2. Print Start Auto-Load</h4>
+                <p className="text-[10px] text-neutral-500 mb-2">Add this inside your <code className="text-white">PRINT_START</code> macro:</p>
+                <div className="p-3 bg-black rounded font-mono text-[9px] text-neutral-600 leading-relaxed italic">
+                  &#123;% set offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %&#125;<br/>
+                  SET_GCODE_OFFSET Z_ADJUST=&#123;offset&#125; MOVE=1
                 </div>
              </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-neutral-500 uppercase">3. Full Macro Configuration (Copy-Paste)</label>
+            <label className="text-[10px] font-bold text-neutral-500 uppercase">3. Full Macro Configuration</label>
             <div className="relative group">
               <pre className="p-6 bg-black rounded-2xl border border-neutral-800 text-[10px] font-mono text-blue-400/80 leading-relaxed overflow-x-auto max-h-[400px]">
                 {macrosText}

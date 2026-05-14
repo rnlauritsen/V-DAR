@@ -111,8 +111,18 @@ To ensure V-DAR starts automatically on your printer controller:
    sudo systemctl start vdar
    ```
 
-## Macro-First Workflow (Highly Recommended)
-Because KlipperScreen, OctoEverywhere, and embedded browser frames have strict security limits, V-DAR is best operated via **Klipper Macros**. This allows you to trigger scans directly from your printer's physical screen.
+## Smart Persistence (CNC-Style)
+V-DAR can now save its results directly to a file (`variables.cfg`) so they aren't lost when you restart or power cycle. This allows your `PRINT_START` macro to automatically load and apply the calibration.
+
+1. **Setup Storage:** Add `[save_variables]` to your config as shown in the **Klipper Macros** tab.
+2. **Auto-Load:** Update your `PRINT_START` macro to include the loaded variable:
+   ```gcode
+   {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
+   SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
+   ```
+
+## Macro-First Workflow (KlipperScreen & OctoEverywhere)
+Because KlipperScreen and OctoEverywhere have limited browser support, V-DAR is best operated via **Klipper Macros**. This allows you to trigger scans directly from your printer's physical screen.
 
 ### 1. Download the Macros
 Download [vdar_macros.txt](./vdar_macros.txt) and copy the contents into your `printer.cfg`.
