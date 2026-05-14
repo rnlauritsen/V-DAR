@@ -70,7 +70,20 @@ export default function App() {
               <div className="space-y-4">
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest">1. Smart Persistence</h4>
+                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">1. Hardware Config</h4>
+                    <span className="text-[10px] bg-white/5 text-white/40 px-2 py-0.5 rounded-full border border-white/10 uppercase font-bold tracking-tighter italic">Check Extruder</span>
+                  </div>
+                  <p className="text-[12px] text-neutral-500 italic">V-DAR reads your <code className="text-white">nozzle_diameter</code> directly from your existing config. No manual macro edits required.</p>
+                  <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-neutral-400 border border-white/5 group-hover:border-white/20 transition-colors">
+                    [extruder]<br/>
+                    <span className="text-blue-400 font-bold">nozzle_diameter: 0.600</span><br/>
+                    # ... your other settings
+                  </pre>
+                </div>
+
+                <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest">2. Smart Persistence</h4>
                     <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 uppercase font-bold tracking-tighter">Required</span>
                   </div>
                   <p className="text-[12px] text-neutral-500">Enable variable storage to preserve calibration across reboots.</p>
@@ -81,7 +94,7 @@ export default function App() {
                 </div>
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
-                  <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">2. Improved Scan Engine</h4>
+                  <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">3. Improved Scan Engine</h4>
                   <p className="text-[12px] text-neutral-500">The engine now automatically reads <code className="text-white">nozzle_diameter</code> from your <code className="text-white">[extruder]</code> config. No manual setting needed.</p>
                   <div className="p-4 bg-black rounded-xl text-[10px] font-mono text-neutral-500 border border-white/5 overflow-x-auto">
                     [gcode_macro V_DAR_SCAN]<br/>
@@ -126,7 +139,7 @@ export default function App() {
                 </div>
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
-                  <h4 className="text-xs font-bold text-orange-400 uppercase tracking-widest">3. Auto-Loading Logic</h4>
+                  <h4 className="text-xs font-bold text-orange-400 uppercase tracking-widest">4. Auto-Loading Logic</h4>
                   <p className="text-[12px] text-neutral-500">Add this to your <code className="text-white">PRINT_START</code> macro to fetch the last scan.</p>
                   <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-blue-400 border border-white/5 group-hover:border-orange-500/20 transition-colors overflow-x-auto leading-relaxed italic">
                     &#123;% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %&#125;<br/>

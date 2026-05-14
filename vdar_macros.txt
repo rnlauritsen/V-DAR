@@ -8,7 +8,9 @@
 filename: ~/printer_data/config/variables.cfg
 
 # 2. THE HARDWARE CONFIG
-# Using your SKR Pico 2 - Fan 2 (Current line laser pin)
+# Ensure your extruder nozzle is correctly defined in [extruder]
+# V-DAR pulls this value automatically to calculate extrusion volume.
+
 [output_pin vdar_laser]
 pin: mcu2:gpio18
 pwm: true
