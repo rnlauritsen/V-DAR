@@ -31,10 +31,16 @@ gcode:
     {% set MAT = params.MATERIAL|default("PLA") %}
     {% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %}
     {% set B_TEMP = params.BED_TEMP|default(60)|float %}
+    {% set NOZZLE = params.NOZZLE_SIZE|default(0.6)|float %}
+    {% set PA = params.PRESSURE_ADVANCE|default(0.0)|float %}
+    {% set PA_ST = params.SMOOTH_TIME|default(0.04)|float %}
 
-    M117 V-DAR: Scanning {MAT}
+    M117 V-DAR: Scanning {MAT} ({NOZZLE}mm)
     G28
     G90
+    
+    # --- OPTIMIZE EXTRUSION ---
+    SET_PRESSURE_ADVANCE ADVANCE={PA} SMOOTH_TIME={PA_ST}
     
     M117 V-DAR: Heating {MAT}
     M104 S{E_TEMP}
@@ -47,26 +53,34 @@ gcode:
     G1 Z0.3 F3000                # Go to print height
     G1 X50 Y125 F6000            # Move to start
     M83                          # Relative extrusion
-    G1 X200 E10 F1200            # Extrude 150mm test line
-    G1 E-1 F1800                 # Retract
+    
+    # Calculate extrusion based on nozzle size (simplified volume check)
+    # 0.4mm nozzle = E10, 0.6mm nozzle = E15 approx for similar density
+    {% set ext_amount = (10.0 * (NOZZLE / 0.4)) %}
+    G1 X200 E{ext_amount} F1200  # Extrude test line
+    G1 E-1 F1800                 # Retract 1mm to prevent ooze
+    
+    # --- STEP 2: COOLDOWN (PREVENT CONTAMINATION) ---
+    M117 V-DAR: Cooling Down...
+    M104 S0                      # Turn off extruder heater
+    M140 S0                      # Turn off bed heater
+    G4 P2000                     # Wait 2 seconds for pressure to stabilize
     G1 Z5 F3000                  # Lift clear for laser
 
-    # --- STEP 2: LASER SCAN SWEEP ---
+    # --- STEP 3: LASER SCAN SWEEP ---
     M117 V-DAR: Scanning Sample
     G1 X50 Y125 F6000            # Back to start of line
     SET_PIN PIN=vdar_laser VALUE=1
-    M117 V-DAR: Laser ON
     
-    # We move slowly across the line to let the sensor pick up the profile
-    G1 X200 Y125 F600            # Slow 10mm/s sweep
+    # We move slowly across the line
+    G1 X200 Y125 F600            # Slow sweep (10mm/s)
     
     SET_PIN PIN=vdar_laser VALUE=0
-    M117 V-DAR: Laser OFF
-    
     G1 Z10 F3000                 # Lift clear
     
-    # After calculation:
-    V_DAR_SET_OFFSET VALUE=0.042 # Example value found during scan
+    M117 V-DAR: Processing...
+    M118 V-DAR: Scan sweep finished. Service processing results...
+    # NOTE: V_DAR_SET_OFFSET is called by the V-DAR service after analysis.
     
     M117 V-DAR: Scan Done
 
@@ -75,23 +89,24 @@ gcode:
 [gcode_macro V_DAR_PLA]
 description: Quick PLA Scan
 gcode:
-    V_DAR_SCAN MATERIAL="PLA" EXTRUDER_TEMP=210 BED_TEMP=60
+    V_DAR_SCAN MATERIAL="PLA" EXTRUDER_TEMP=210 BED_TEMP=60 NOZZLE_SIZE=0.6 PRESSURE_ADVANCE=0.035
 
 [gcode_macro V_DAR_ABS]
 description: Quick ABS Scan
 gcode:
-    V_DAR_SCAN MATERIAL="ABS" EXTRUDER_TEMP=250 BED_TEMP=110
+    V_DAR_SCAN MATERIAL="ABS" EXTRUDER_TEMP=250 BED_TEMP=110 NOZZLE_SIZE=0.6 PRESSURE_ADVANCE=0.045
 
 [gcode_macro V_DAR_PETG]
 description: Quick PETG Scan
 gcode:
-    V_DAR_SCAN MATERIAL="PETG" EXTRUDER_TEMP=240 BED_TEMP=80
+    V_DAR_SCAN MATERIAL="PETG" EXTRUDER_TEMP=240 BED_TEMP=80 NOZZLE_SIZE=0.6 PRESSURE_ADVANCE=0.06
 
 [gcode_macro V_DAR_RESET]
 description: Resets all V-DAR offsets to 0
 gcode:
     SAVE_VARIABLE VARIABLE=vdar_last_offset VALUE=0.0
     SET_GCODE_OFFSET Z=0 MOVE=1
+    SET_PRESSURE_ADVANCE ADVANCE=0.0 SMOOTH_TIME=0.04
     M221 S100
     M117 V-DAR: Reset to Stock
     M118 V-DAR: All offsets cleared

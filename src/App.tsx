@@ -89,9 +89,13 @@ export default function App() {
                     &nbsp;&nbsp;&#123;% set MAT = params.MATERIAL|default("PLA") %&#125;<br/>
                     &nbsp;&nbsp;&#123;% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %&#125;<br/>
                     &nbsp;&nbsp;&#123;% set B_TEMP = params.BED_TEMP|default(60)|float %&#125;<br/>
+                    &nbsp;&nbsp;&#123;% set NOZZLE = params.NOZZLE_SIZE|default(0.6)|float %&#125;<br/>
+                    &nbsp;&nbsp;&#123;% set PA = params.PRESSURE_ADVANCE|default(0.0)|float %&#125;<br/>
                     <br/>
                     &nbsp;&nbsp;G28<br/>
                     &nbsp;&nbsp;G90<br/>
+                    <br/>
+                    &nbsp;&nbsp;SET_PRESSURE_ADVANCE ADVANCE=&#123;PA&#125;<br/>
                     <br/>
                     &nbsp;&nbsp;M117 V-DAR: Heating &#123;MAT&#125;<br/>
                     &nbsp;&nbsp;M104 S&#123;E_TEMP&#125;<br/>
@@ -103,8 +107,13 @@ export default function App() {
                     &nbsp;&nbsp;G1 Z0.3 F3000<br/>
                     &nbsp;&nbsp;G1 X50 Y125 F6000<br/>
                     &nbsp;&nbsp;M83<br/>
-                    &nbsp;&nbsp;G1 X200 E10 F1200<br/>
-                    &nbsp;&nbsp;G1 E-1 F1800<br/>
+                    &nbsp;&nbsp;&#123;% set ext = (10.0 * (NOZZLE / 0.4)) %&#125;<br/>
+                    &nbsp;&nbsp;G1 X200 E&#123;ext&#125; F1200<br/>
+                    &nbsp;&nbsp;G1 E-1 F1800&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Retract 1mm<br/>
+                    <br/>
+                    &nbsp;&nbsp;# --- COOLDOWN ---<br/>
+                    &nbsp;&nbsp;M104 S0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Off to prevent ooze<br/>
+                    &nbsp;&nbsp;G4 P2000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Wait for pressure<br/>
                     &nbsp;&nbsp;G1 Z5 F3000<br/>
                     <br/>
                     &nbsp;&nbsp;# --- SCAN SAMPLE ---<br/>
@@ -112,7 +121,7 @@ export default function App() {
                     &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=1<br/>
                     &nbsp;&nbsp;G1 X200 Y125 F600<br/>
                     &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=0<br/>
-                    &nbsp;&nbsp;V_DAR_SET_OFFSET VALUE=0.042
+                    &nbsp;&nbsp;M118 V-DAR: Waiting for service analysis...
                   </div>
                 </div>
 
