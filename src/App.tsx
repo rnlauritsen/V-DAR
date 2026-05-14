@@ -740,39 +740,25 @@ gcode: SET_PIN PIN=lidar_laser VALUE=1`}
 
 function MacrosTab() {
   const macrosText = `#####################################################################
-# V-DAR: Smart Persistence & CNC-Style Variables
+# V-DAR: Optimized for your 2.4 setup (2x SKR PICO)
 #####################################################################
 
 [save_variables]
-filename: ~/printer_data/config/variables.cfg # Stores data across reboots
+filename: ~/printer_data/config/variables.cfg
+
+[output_pin vdar_laser]
+pin: mcu2:gpio18
+pwm: true
 
 [gcode_macro V_DAR_SET_OFFSET]
-description: Permanently saves the current calibration value
 gcode:
     {% set VAL = params.VALUE|default(0.0)|float %}
     SAVE_VARIABLE VARIABLE=vdar_last_offset VALUE={VAL}
-    M118 V-DAR: Offset {VAL} saved to variables.cfg
 
-[gcode_macro V_DAR_SCAN]
-gcode:
-    {% set MAT = params.MATERIAL|default("PLA") %}
-    M117 V-DAR: {MAT} Scanning...
-    # ... Laser movement ...
-    V_DAR_SET_OFFSET VALUE=0.042 # Example value found during scan
-
-# --- PRINT START INTEGRATION ---
-# Replace your existing [gcode_macro PRINT_START] with this logic:
 [gcode_macro PRINT_START]
 gcode:
-    # 1. Load V-DAR Offset
-    {% set vdar_offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
-    
-    # 2. Apply it (This happens before or during homing/leveling)
-    SET_GCODE_OFFSET Z_ADJUST={vdar_offset} MOVE=1
-    M117 V-DAR: Applied {vdar_offset} offset
-    
-    # 3. Rest of your print start (G28, BED_MESH, etc)
-    G28
+    {% set offset = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
+    SET_GCODE_OFFSET Z_ADJUST={offset} MOVE=1
     ...`;
 
   return (
@@ -806,10 +792,11 @@ gcode:
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
                 <h4 className="text-xs font-bold text-blue-400 uppercase mb-3">1. Enable Storage</h4>
-                <p className="text-[10px] text-neutral-500 mb-2">Add this to enable the "Hard Drive" for your variables:</p>
+                <p className="text-[10px] text-neutral-500 mb-2">Confirmed: Use your mcu2 pin for the laser.</p>
                 <div className="p-3 bg-black rounded font-mono text-[10px] text-neutral-500 leading-relaxed shadow-inner">
-                  [save_variables]<br/>
-                  filename: ~/printer_data/config/variables.cfg
+                  [output_pin vdar_laser]<br/>
+                  pin: mcu2:gpio18<br/>
+                  pwm: true
                 </div>
              </div>
              <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
@@ -850,6 +837,26 @@ gcode:
             <p>V_DAR_ABS</p>
           </div>
         </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-black/40">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-neutral-400 mb-6 flex items-center gap-2">
+          <Settings className="w-4 h-4" />
+          Compatibility & Safety
+        </h3>
+        <p className="text-sm text-neutral-500 leading-relaxed">
+          V-DAR uses <code className="text-white">SET_GCODE_OFFSET Z_ADJUST</code>. This is a <b>software-only</b> adjustment.
+        </p>
+        <ul className="mt-4 space-y-2 text-[11px] text-neutral-600">
+          <li className="flex items-center gap-2">
+            <span className="w-1 h-1 bg-blue-500 rounded-full" />
+            <b>Extruder Safe:</b> Does not affect <code className="text-neutral-400 font-mono">rotation_distance</code> or <code className="text-neutral-400 font-mono">pressure_advance</code>.
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="w-1 h-1 bg-blue-500 rounded-full" />
+            <b>Additive:</b> Works on top of your existing bed mesh and probe calibration.
+          </li>
+        </ul>
       </div>
     </motion.div>
   );

@@ -44,7 +44,7 @@ To "enable" the hardware, add this to your `printer.cfg`:
 1. **Laser Definition:**
    ```ini
    [output_pin vdar_laser]
-   pin: !PC1  # Replace with your actual FAN port pin
+   pin: mcu2:gpio18  # Explicitly configured for your SKR Pico 2
    pwm: true
    value: 0
    shutdown_value: 0
@@ -111,16 +111,24 @@ To ensure V-DAR starts automatically on your printer controller:
    sudo systemctl start vdar
    ```
 
-## Smart Persistence (CNC-Style)
-V-DAR can now save its results directly to a file (`variables.cfg`) so they aren't lost when you restart or power cycle. This allows your `PRINT_START` macro to automatically load and apply the calibration.
+## Hardware Compatibility
+V-DAR is designed to be non-intrusive:
+- **Extruder Config:** You do **not** need to change your `[extruder]` settings. Everything from `rotation_distance` to `pressure_advance` remains untouched.
+- **Probe/Z-Offset:** V-DAR uses `Z_ADJUST`, which is additive. It shifts your nozzle height based on the material without overwriting your primary probe calibration.
 
-1. **Setup Storage:** Add `[save_variables]` to your config as shown in the **Klipper Macros** tab.
-2. **Auto-Load:** Update your `PRINT_START` macro. The logic **must** be inside the `gcode:` block and indented:
+## Smart Persistence (CNC-Style)
+V-DAR supports **Smart Persistence**, which saves calibration results to a file (`variables.cfg`) so they are preserved across reboots.
+
+1. **Setup Storage:** Add `[save_variables]` to your config:
+   ```ini
+   [save_variables]
+   filename: ~/printer_data/config/variables.cfg
+   ```
+2. **Auto-Load:** Add this logic inside your `[gcode_macro PRINT_START]`:
    ```gcode
-   [gcode_macro PRINT_START]
-   gcode:
-       {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
-       SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
+   # Inside your PRINT_START macro:
+   {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
+   SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
    ```
 
 ## Macro-First Workflow (KlipperScreen & OctoEverywhere)

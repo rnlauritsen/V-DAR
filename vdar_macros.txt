@@ -1,21 +1,20 @@
 #####################################################################
-# V-DAR: Smart Persistence & CNC-Style Variable Workflow
+# V-DAR: Optimized for your 2.4 setup (2x SKR PICO)
 #####################################################################
 
 # 1. THE "STORAGE" CONFIG
-# Add this to your config to allow saving variables to disk
 [save_variables]
 filename: ~/printer_data/config/variables.cfg
 
 # 2. THE HARDWARE CONFIG
+# Using your SKR Pico 2 - Fan 2 (Current line laser pin)
 [output_pin vdar_laser]
-pin: !PC1 # <--- CHANGE THIS to your laser fan pin
+pin: mcu2:gpio18
 pwm: true
 value: 0
 shutdown_value: 0
 
 # 3. THE PERSISTENCE MACRO
-# This saves the calculated value to the variables.cfg file
 [gcode_macro V_DAR_SET_OFFSET]
 description: Saves the calibration value across reboots
 gcode:
@@ -27,32 +26,33 @@ gcode:
 [gcode_macro V_DAR_SCAN]
 description: Base macro for V-DAR scanning
 gcode:
-    {% set MATERIAL = params.MATERIAL|default("PLA")|string %}
-    
-    M117 V-DAR: Scanning {MATERIAL}
+    {% set MAT = params.MATERIAL|default("PLA") %}
+    M117 V-DAR: Scanning {MAT}
     G28
     SET_PIN PIN=vdar_laser VALUE=1
     
     # ... Your scan path movement here ...
     # After calculation (manually or via script):
-    V_DAR_SET_OFFSET VALUE=0.042 # Example value
+    V_DAR_SET_OFFSET VALUE=0.042 # Example value found during scan
     
     SET_PIN PIN=vdar_laser VALUE=0
     M117 V-DAR: Scan Done
 
-# 5. INTEGRATION IN PRINT_START
-# Replace your existing PRINT_START macro logic with this:
-#
+# 5. RECOMMENDED PRINT_START
+# Use this in your printer.cfg to merge your heating logic with V-DAR
 [gcode_macro PRINT_START]
 gcode:
-    # 1. Load the calibration value from disk
+    # A. Load V-DAR Persistence
     {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
     
-    # 2. Apply it (This must be done BEFORE or DURING the print start)
-    # Using Z_ADJUST adds the value to your existing offset
+    # B. Apply calculated offset
     SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
-    
     M117 V-DAR: Applied {vdar_o} offset
     
-    # ... Rest of your macro (Homing, Heating, etc.) ...
-    G28
+    # C. Your original heating/homing logic
+    M190 S50            # Heat bed
+    M109 S150           # Heat hotend
+    G28                 # Home all
+    QUAD_GANTRY_LEVEL   # Level gantry
+    G90                 # Absolute positioning
+    G1 Z20 F3000        # Move clear
