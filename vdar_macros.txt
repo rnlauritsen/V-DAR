@@ -15,23 +15,14 @@ pwm: true
 value: 0
 shutdown_value: 0
 
-# 3. THE PERSISTENCE MACRO
-# This saves the calculated value to the variables.cfg file
-[gcode_macro V_DAR_SET_OFFSET]
-description: Saves the calibration value across reboots
-gcode:
-    {% set VAL = params.VALUE|default(0.0)|float %}
-    SAVE_VARIABLE VARIABLE=vdar_last_offset VALUE={VAL}
-    M118 V-DAR: Result {VAL} stored in variables.cfg
-
-# 4. THE SCAN ENGINE
+# 3. THE BASE SCAN ENGINE
 [gcode_macro V_DAR_SCAN]
 description: Base macro for V-DAR scanning
 gcode:
     {% set MAT = params.MATERIAL|default("PLA") %}
     {% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %}
     {% set B_TEMP = params.BED_TEMP|default(60)|float %}
-    {% set NOZZLE = params.NOZZLE_SIZE|default(0.6)|float %}
+    {% set NOZZLE = printer.configfile.settings.extruder.nozzle_diameter %}
     {% set PA = params.PRESSURE_ADVANCE|default(0.0)|float %}
     {% set PA_ST = params.SMOOTH_TIME|default(0.04)|float %}
 
@@ -89,17 +80,17 @@ gcode:
 [gcode_macro V_DAR_PLA]
 description: Quick PLA Scan
 gcode:
-    V_DAR_SCAN MATERIAL="PLA" EXTRUDER_TEMP=210 BED_TEMP=60 NOZZLE_SIZE=0.6 PRESSURE_ADVANCE=0.035
+    V_DAR_SCAN MATERIAL="PLA" EXTRUDER_TEMP=210 BED_TEMP=60 PRESSURE_ADVANCE=0.035
 
 [gcode_macro V_DAR_ABS]
 description: Quick ABS Scan
 gcode:
-    V_DAR_SCAN MATERIAL="ABS" EXTRUDER_TEMP=250 BED_TEMP=110 NOZZLE_SIZE=0.6 PRESSURE_ADVANCE=0.045
+    V_DAR_SCAN MATERIAL="ABS" EXTRUDER_TEMP=250 BED_TEMP=110 PRESSURE_ADVANCE=0.045
 
 [gcode_macro V_DAR_PETG]
 description: Quick PETG Scan
 gcode:
-    V_DAR_SCAN MATERIAL="PETG" EXTRUDER_TEMP=240 BED_TEMP=80 NOZZLE_SIZE=0.6 PRESSURE_ADVANCE=0.06
+    V_DAR_SCAN MATERIAL="PETG" EXTRUDER_TEMP=240 BED_TEMP=80 PRESSURE_ADVANCE=0.06
 
 [gcode_macro V_DAR_RESET]
 description: Resets all V-DAR offsets to 0

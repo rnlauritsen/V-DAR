@@ -71,7 +71,7 @@ export default function App() {
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest">1. Smart Persistence</h4>
-                    <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20">Required</span>
+                    <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 uppercase font-bold tracking-tighter">Required</span>
                   </div>
                   <p className="text-[12px] text-neutral-500">Enable variable storage to preserve calibration across reboots.</p>
                   <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-neutral-400 border border-white/5 group-hover:border-blue-500/20 transition-colors">
@@ -82,14 +82,14 @@ export default function App() {
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
                   <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">2. Improved Scan Engine</h4>
-                  <p className="text-[12px] text-neutral-500">Universal macro that handles heating based on material parameters.</p>
+                  <p className="text-[12px] text-neutral-500">The engine now automatically reads <code className="text-white">nozzle_diameter</code> from your <code className="text-white">[extruder]</code> config. No manual setting needed.</p>
                   <div className="p-4 bg-black rounded-xl text-[10px] font-mono text-neutral-500 border border-white/5 overflow-x-auto">
                     [gcode_macro V_DAR_SCAN]<br/>
                     gcode:<br/>
                     &nbsp;&nbsp;&#123;% set MAT = params.MATERIAL|default("PLA") %&#125;<br/>
                     &nbsp;&nbsp;&#123;% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %&#125;<br/>
                     &nbsp;&nbsp;&#123;% set B_TEMP = params.BED_TEMP|default(60)|float %&#125;<br/>
-                    &nbsp;&nbsp;&#123;% set NOZZLE = params.NOZZLE_SIZE|default(0.6)|float %&#125;<br/>
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">&#123;% set NOZZLE = printer.configfile.settings.extruder.nozzle_diameter %&#125;</span><br/>
                     &nbsp;&nbsp;&#123;% set PA = params.PRESSURE_ADVANCE|default(0.0)|float %&#125;<br/>
                     <br/>
                     &nbsp;&nbsp;G28<br/>
