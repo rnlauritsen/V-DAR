@@ -94,7 +94,7 @@ const KlipperInput = ({ label, value, unit, onChange }: { label: string, value: 
 );
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'camera' | 'calibration' | 'settings' | 'about'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'camera' | 'calibration' | 'macros' | 'settings'>('dashboard');
   const [printer, setPrinter] = useState<PrinterState>({
     status: 'disconnected',
     hostname: 'voron-24.local',
@@ -182,16 +182,16 @@ export default function App() {
             onClick={() => setActiveTab('calibration')} 
           />
           <SidebarItem 
+            icon={Terminal} 
+            label="Klipper Macros" 
+            active={activeTab === 'macros'} 
+            onClick={() => setActiveTab('macros')} 
+          />
+          <SidebarItem 
             icon={Settings} 
             label="Hardware" 
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
-          />
-          <SidebarItem 
-            icon={Info} 
-            label="Help" 
-            active={activeTab === 'about'} 
-            onClick={() => setActiveTab('about')} 
           />
         </nav>
 
@@ -239,7 +239,7 @@ export default function App() {
             {activeTab === 'camera' && <CameraTab config={config} />}
             {activeTab === 'calibration' && <CalibrationTab printer={printer} config={config} />}
             {activeTab === 'settings' && <SettingsTab config={config} setConfig={setConfig} />}
-            {activeTab === 'about' && <AboutTab />}
+            {activeTab === 'macros' && <MacrosTab />}
           </AnimatePresence>
         </div>
       </main>
@@ -738,6 +738,106 @@ gcode: SET_PIN PIN=lidar_laser VALUE=1`}
   );
 }
 
+function MacrosTab() {
+  const macrosText = `#####################################################################
+# V-DAR: Material-Specific Macros
+#####################################################################
+
+[gcode_macro V_DAR_ABS]
+description: Runs high-temp ABS calibration
+gcode:
+    V_DAR_SCAN MATERIAL="ABS"
+
+[gcode_macro V_DAR_PLA]
+description: Runs standard PLA calibration
+gcode:
+    V_DAR_SCAN MATERIAL="PLA"
+
+[gcode_macro V_DAR_SCAN]
+gcode:
+    {% set MAT = params.MATERIAL|default("PLA") %}
+    M117 V-DAR: {MAT} Scanning...
+    # ... Laser movement ...`;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="max-w-4xl space-y-8"
+    >
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-blue-500/5">
+        <div className="flex items-center justify-between mb-8">
+           <h3 className="text-xl font-bold text-white flex items-center gap-3">
+             <Terminal className="w-6 h-6 text-blue-500" />
+             Material-Specific Macros
+           </h3>
+           <a 
+             href="/vdar_macros.txt" 
+             download 
+             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-blue-500 transition-colors"
+           >
+             <Download className="w-4 h-4" />
+             Download .txt File
+           </a>
+        </div>
+
+        <div className="space-y-6">
+          <p className="text-sm text-neutral-400 leading-relaxed italic">
+            "We've shifted to a macro-first workflow. This ensures V-DAR works perfectly on klipper screen, OctoEverywhere, and older Mainsail versions by bypassing the browser UI entirely."
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
+                <h4 className="text-xs font-bold text-blue-400 uppercase mb-3">1. Add the Laser Pin</h4>
+                <div className="p-3 bg-black rounded font-mono text-[10px] text-neutral-500 leading-relaxed shadow-inner">
+                  [output_pin vdar_laser]<br/>
+                  pin: !PC1 <span className="text-neutral-700"># Change to yours</span><br/>
+                  pwm: true
+                </div>
+             </div>
+             <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
+                <h4 className="text-xs font-bold text-green-400 uppercase mb-3">2. Choose Your Filament</h4>
+                <p className="text-[10px] text-neutral-500 mb-2">Once added, you can click these on your printer screen:</p>
+                <div className="flex flex-wrap gap-2">
+                   <div className="px-2 py-1 bg-neutral-800 rounded font-mono text-[9px] text-white">V_DAR_PLA</div>
+                   <div className="px-2 py-1 bg-neutral-800 rounded font-mono text-[9px] text-white">V_DAR_ABS</div>
+                   <div className="px-2 py-1 bg-neutral-800 rounded font-mono text-[9px] text-white">V_DAR_PETG</div>
+                </div>
+             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-neutral-500 uppercase">3. Full Macro Configuration (Copy-Paste)</label>
+            <div className="relative group">
+              <pre className="p-6 bg-black rounded-2xl border border-neutral-800 text-[10px] font-mono text-blue-400/80 leading-relaxed overflow-x-auto max-h-[400px]">
+                {macrosText}
+              </pre>
+              <button className="absolute top-4 right-4 p-2 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors">
+                 <Copy className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-orange-500/5">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-orange-400 mb-6 flex items-center gap-2">
+          <Zap className="w-4 h-4" />
+          Hardware Setup & Persistence
+        </h3>
+        <div className="space-y-4 text-sm text-neutral-400 leading-relaxed">
+          <p>The web interface will still display all scan data at <code className="text-white">http://[printer-ip]:3000</code> for deeper analysis, but the day-to-day operation is now handled entirely through your printer's physical controls.</p>
+          <div className="p-4 bg-black rounded-lg border border-neutral-800 font-mono text-blue-400 space-y-1 text-[11px]">
+            <p># Run ABS Calibration from console/screen</p>
+            <p>V_DAR_ABS</p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function AboutTab() {
   return (
     <motion.div 
@@ -877,57 +977,72 @@ function AboutTab() {
 
       <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-blue-500/5">
         <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
-          <LayoutDashboard className="w-4 h-4 text-blue-500" />
-          Adding V-DAR to your Sidebar
+          <Terminal className="w-4 h-4 text-blue-500" />
+          KlipperScreen & Macro-First Setup
         </h3>
         <div className="space-y-6">
           <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-             <h4 className="text-xs font-bold text-blue-400 uppercase mb-2">Option 1: The "Webcam" Trick (High Success)</h4>
-             <p className="text-[11px] text-neutral-400 leading-relaxed mb-3">
-               If you can't find "External Links", you can force V-DAR onto your dashboard by adding it as a webcam:
-             </p>
-             <ol className="text-[11px] text-neutral-500 space-y-2 list-decimal ml-4 leading-relaxed">
-                <li>Go to <b className="text-white">Settings</b> &gt; <b className="text-white">WEBCAMS</b>.</li>
-                <li>Click <b className="text-blue-400 font-bold">+ Add Webcam</b>.</li>
-                <li>Name: <code className="text-white font-mono">V-DAR</code></li>
-                <li>URL & Stream URL: <code className="text-white bg-black px-1 rounded text-[10px]">http://[printer-ip]:3000</code></li>
-                <li>Save. V-DAR will now appear as a card on your dashboard or in the Webcam tab.</li>
-             </ol>
-          </div>
-
-          <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-             <h4 className="text-xs font-bold text-orange-400 uppercase mb-2">Option 2: The "Right Way" (External Links)</h4>
-             <p className="text-[11px] text-neutral-400 leading-relaxed mb-3">
-                In <b className="text-white">Settings</b> &gt; <b className="text-white">NAVIGATION</b> (or MISCELLANEOUS):
-             </p>
-             <ol className="text-[11px] text-neutral-500 space-y-2 list-decimal ml-4">
-                <li>Scroll to the <b className="text-white">very bottom</b>.</li>
-                <li>Click <b className="text-white font-bold">+ Add Link</b>.</li>
-                <li>Toggle <b className="text-white">Open in Frame</b> to <b>ON</b>.</li>
-             </ol>
-          </div>
-
-          <div className="p-4 bg-black/50 border border-neutral-700/50 rounded-xl">
-             <h4 className="text-xs font-bold text-neutral-400 uppercase mb-2">KlipperScreen & Touch Displays</h4>
-             <p className="text-[11px] text-neutral-500 leading-relaxed">
-               <b>Warning:</b> KlipperScreen (the physical screen on your printer) does not support web browsers. V-DAR will <b>not</b> show up on that screen. You must use a phone, tablet, or PC browser.
-             </p>
-          </div>
-
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-             <h4 className="text-xs font-bold text-red-400 uppercase mb-2">"Error while connecting"?</h4>
+             <h4 className="text-xs font-bold text-blue-400 uppercase mb-2">Why Macros?</h4>
              <p className="text-[11px] text-neutral-400 leading-relaxed">
-               This is usually a browser security block. Check these two things:
+               Since your physical printer screen and OctoEverywhere work best with G-code, these macros will allow you to trigger scans and see results directly on your screen without the web UI.
              </p>
-             <ul className="text-[11px] text-neutral-500 space-y-2 list-disc ml-4 mt-2">
-                <li><b className="text-white">HTTP vs HTTPS:</b> If Mainsail is <span className="text-blue-400 font-bold">https://</span>, the browser will block V-DAR (<span className="text-blue-400">http://</span>). Use <b className="text-white">http://</b> for both.</li>
-                <li><b className="text-white">Applied Fix:</b> I've updated the server config to allow "Framing". Please <b className="text-white">restart the service</b>:
-                  <code className="block mt-1 bg-black p-1 text-blue-400">sudo systemctl restart vdar</code>
-                </li>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-neutral-500 uppercase">1. Add to printer.cfg</label>
+              <div className="p-4 bg-black rounded-xl border border-neutral-800 text-[10px] font-mono text-neutral-400 leading-relaxed overflow-x-auto">
+                <p className="text-blue-400"># Enable Laser Port</p>
+                [output_pin vdar_laser]<br/>
+                pin: !PC1 <span className="text-neutral-600"># Change to your Fan Pin</span><br/>
+                pwm: true<br/>
+                <br/>
+                <p className="text-blue-400"># The Universal Scan Macro</p>
+                [gcode_macro V_DAR_SCAN]<br/>
+                description: Run V-DAR scan and show status on screen<br/>
+                gcode:<br/>
+                &nbsp;&nbsp;M117 V-DAR: Scan Init<br/>
+                &nbsp;&nbsp;G28 <span className="text-neutral-600">; Ensure Homed</span><br/>
+                &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=1<br/>
+                &nbsp;&nbsp;G1 Z5 F3000 <span className="text-neutral-600">; Move to scan height</span><br/>
+                &nbsp;&nbsp;M117 V-DAR: Scanning...<br/>
+                &nbsp;&nbsp;<span className="text-neutral-600"># ... movement commands ...</span><br/>
+                &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=0<br/>
+                &nbsp;&nbsp;M117 V-DAR: Scan Complete<br/>
+                &nbsp;&nbsp;RESPOND TYPE=command MSG="V-DAR: Results pending in Web UI"
+              </div>
+            </div>
+
+            <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-xl">
+               <h4 className="text-xs font-bold text-orange-400 uppercase mb-2">KlipperScreen Buttons</h4>
+               <p className="text-[11px] text-neutral-400">
+                 After adding the macro, go to <b className="text-white">Macros</b> on your printer screen. You will see a <b className="text-white">V_DAR_SCAN</b> button. Clicking it will run the scan and update the status line at the bottom of the screen.
+               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-red-500/5">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
+          <LayoutDashboard className="w-4 h-4 text-red-500" />
+          Mainsail Sidebar: Protocol Check
+        </h3>
+        <div className="space-y-6">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+             <h4 className="text-xs font-bold text-red-400 uppercase mb-2">Protocol Mismatch (The Silent Killer)</h4>
+             <p className="text-[11px] text-neutral-400 leading-relaxed mb-3">
+               If you get a "Connection Error" in the sidebar, look at your browser's address bar:
+             </p>
+             <ul className="text-[11px] text-neutral-500 space-y-2 list-disc ml-4">
+                <li>If you see <b className="text-white">https://</b>[ip-address], the browser <b>will block</b> the sidebar link.</li>
+                <li>To fix this: Visit <b className="text-blue-400 font-bold underline">http://</b>[ip-address] (Mainsail without the 'S') to access the printer.</li>
+                <li>V-DAR is currently an internal tool and does not use SSL/HTTPS.</li>
              </ul>
           </div>
         </div>
       </div>
+
 
       <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8">
         <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">

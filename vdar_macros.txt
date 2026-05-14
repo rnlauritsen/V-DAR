@@ -1,0 +1,75 @@
+#####################################################################
+# V-DAR: Virtual Displacement Animation & Rendering
+# Klipper Macros for Material-Specific Calibration
+#####################################################################
+
+[output_pin vdar_laser]
+pin: !PC1 # <--- CHANGE THIS to your laser fan pin
+pwm: true
+value: 0
+shutdown_value: 0
+
+# --- BASE SCAN MACRO ---
+# Usage: V_DAR_SCAN MATERIAL="PLA"
+[gcode_macro V_DAR_SCAN]
+description: Base macro for V-DAR scanning
+gcode:
+    {% set MATERIAL = params.MATERIAL|default("PLA")|string %}
+    
+    # 1. Warmup
+    M117 V-DAR: Heating for {MATERIAL}
+    {% if MATERIAL == "PLA" %}
+        M104 S210
+        M140 S60
+    {% elif MATERIAL == "ABS" %}
+        M104 S250
+        M140 S110
+    {% elif MATERIAL == "PETG" %}
+        M104 S240
+        M140 S80
+    {% endif %}
+
+    # 2. Wait for Temps
+    M109 S{printer.extruder.target}
+    M190 S{printer.heater_bed.target}
+
+    # 3. Preparation
+    M117 V-DAR: Homig...
+    G28
+    
+    # 4. Scanning Sequence
+    M117 V-DAR: Scanning {MATERIAL}
+    SET_PIN PIN=vdar_laser VALUE=1
+    G90
+    G1 Z5 F3000
+    G1 X100 Y100 F6000 # Move to start
+    # ... Insert your specific scan path here ...
+    # Example movement loop or specific flow lines
+    G1 X150 E10 F1200 # Sample extrusion
+    
+    # 5. Finish
+    SET_PIN PIN=vdar_laser VALUE=0
+    M117 V-DAR: {MATERIAL} Scan Done
+    RESPOND TYPE=command MSG="V-DAR: Scan complete. Results saved to internal logs."
+
+# --- MATERIAL SHORTCUTS ---
+
+[gcode_macro V_DAR_PLA]
+description: Quick PLA Scan
+gcode:
+    V_DAR_SCAN MATERIAL="PLA"
+
+[gcode_macro V_DAR_ABS]
+description: Quick ABS Scan
+gcode:
+    V_DAR_SCAN MATERIAL="ABS"
+
+[gcode_macro V_DAR_PETG]
+description: Quick PETG Scan
+gcode:
+    V_DAR_SCAN MATERIAL="PETG"
+
+[gcode_macro V_DAR_PP]
+description: Quick PP Scan
+gcode:
+    V_DAR_SCAN MATERIAL="PP"

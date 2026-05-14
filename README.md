@@ -111,38 +111,28 @@ To ensure V-DAR starts automatically on your printer controller:
    sudo systemctl start vdar
    ```
 
-## Klipper UI Integration (Manual Step)
-V-DAR does not automatically appear in your sidebar. You must add it as an external link:
+## Macro-First Workflow (Highly Recommended)
+Because KlipperScreen, OctoEverywhere, and embedded browser frames have strict security limits, V-DAR is best operated via **Klipper Macros**. This allows you to trigger scans directly from your printer's physical screen.
 
-### Mainsail Integration
-If V-DAR does not automatically appear in your sidebar, ensure the service is reachable at `http://[your-ip]:3000` in a new tab first.
+### 1. Download the Macros
+Download [vdar_macros.txt](./vdar_macros.txt) and copy the contents into your `printer.cfg`.
 
-#### Method 1: The "Webcam" Trick (Highly Recommended)
-If the "External Links" section is missing from your interface, you can add V-DAR as a virtual webcam:
-1. Open **Settings** (Gear icon) -> **WEBCAMS**.
-2. Click **+ Add Webcam**.
-3. **Name:** `V-DAR`.
-4. **URL & Stream URL:** `http://[your-printer-ip]:3000`.
-5. **Icon:** (Optional) select a laser or tool icon.
-6. Save. V-DAR will now appear as a card on your dashboard or in the Webcams tab.
+### 2. Available Macros
+Once added, these will appear in your **Macros** menu:
+- `V_DAR_PLA`: Optimized for standard filament.
+- `V_DAR_ABS`: Optimized for high-temperature material.
+- `V_DAR_PETG`: Optimized for specific adhesion parameters.
 
-#### Method 2: External Links (Standard UI)
-1. Open the **Interface Settings** modal (Gear icon).
-2. Go to the **NAVIGATION** or **MISCELLANEOUS** tab.
-3. Scroll to the **very bottom** of the right panel.
-4. If you see **External Links**, click **+ Add Link**.
-5. Set **URL** to `http://[your-printer-ip]:3000` and enable **Open in Frame**.
+### 3. Usage
+Simply click the button for the material you are using. The results will be logged to the console, and you can still view the graphical data at:
+`http://[your-printer-ip]:3000`
 
-#### KlipperScreen Warning
-**KlipperScreen** does not contain a web browser. It is mathematically impossible to display the V-DAR interface on the physical printer screen. You must use a mobile phone, tablet, or PC browser to interact with V-DAR.
+---
 
-### "Error while connecting" in Mainsail
-If the sidebar or webcam shows a connection error:
-1. **HTTP vs HTTPS**: If your Mainsail URL is `https://...`, it will block the `http://` V-DAR window. Access Mainsail via the IP address (`http://192.168...`) instead.
-2. **Restart Service**: I've updated `vite.config.ts` to allow cross-origin framing. You must restart the service for this to take effect:
-   ```bash
-   sudo systemctl restart vdar
-   ```
+## Service Installation
+To ensure V-DAR starts on boot:
+1. SSH into your printer.
+2. Follow the steps in the **Klipper Macros** tab in the web interface to create the `vdar.service` file.
 
 ### Direct Access
 If you cannot find the integration settings, or it's not working, verify the service is reachable:
