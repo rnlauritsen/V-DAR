@@ -8,14 +8,12 @@
 filename: ~/printer_data/config/variables.cfg
 
 # 2. THE HARDWARE CONFIG
-# Ensure your extruder nozzle is correctly defined in [extruder]
-# V-DAR pulls this value automatically to calculate extrusion volume.
-
 [output_pin vdar_laser]
 pin: mcu2:gpio18
 pwm: true
 value: 0
 shutdown_value: 0
+# nozzle_diameter: 0.6     # Read automatically from [extruder]
 
 # 3. THE BASE SCAN ENGINE
 [gcode_macro V_DAR_SCAN]

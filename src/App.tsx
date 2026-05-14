@@ -70,14 +70,16 @@ export default function App() {
               <div className="space-y-4">
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">1. Hardware Config</h4>
-                    <span className="text-[10px] bg-white/5 text-white/40 px-2 py-0.5 rounded-full border border-white/10 uppercase font-bold tracking-tighter italic">Check Extruder</span>
+                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">1. Hardware Setup</h4>
+                    <span className="text-[10px] bg-white/5 text-white/40 px-2 py-0.5 rounded-full border border-white/10 uppercase font-bold tracking-tighter italic">Essential</span>
                   </div>
-                  <p className="text-[12px] text-neutral-500 italic">V-DAR reads your <code className="text-white">nozzle_diameter</code> directly from your existing config. No manual macro edits required.</p>
+                  <p className="text-[12px] text-neutral-500">Configure your laser pin and verify your nozzle diameter in <code className="text-white">printer.cfg</code>.</p>
                   <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-neutral-400 border border-white/5 group-hover:border-white/20 transition-colors">
-                    [extruder]<br/>
-                    <span className="text-blue-400 font-bold">nozzle_diameter: 0.600</span><br/>
-                    # ... your other settings
+                    [output_pin vdar_laser]<br/>
+                    pin: mcu2:gpio18<br/>
+                    pwm: true<br/>
+                    <span className="text-blue-400 font-bold">nozzle_diameter: 0.6</span><br/>
+                    <span className="text-neutral-600 italic"># (Note: nozzle size is pulled from [extruder])</span>
                   </pre>
                 </div>
 
