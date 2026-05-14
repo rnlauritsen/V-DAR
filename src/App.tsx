@@ -94,7 +94,16 @@ export default function App() {
                     &nbsp;&nbsp;M104 S&#123;E_TEMP&#125;<br/>
                     &nbsp;&nbsp;M140 S&#123;B_TEMP&#125;<br/>
                     &nbsp;&nbsp;M109 S&#123;E_TEMP&#125;<br/>
-                    &nbsp;&nbsp;M190 S&#123;B_TEMP&#125;
+                    &nbsp;&nbsp;M190 S&#123;B_TEMP&#125;<br/>
+                    <br/>
+                    &nbsp;&nbsp;G28<br/>
+                    &nbsp;&nbsp;G90<br/>
+                    &nbsp;&nbsp;G1 Z5 F3000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move to scan height<br/>
+                    &nbsp;&nbsp;G1 X50 Y125 F6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move to Start<br/>
+                    &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=1<br/>
+                    &nbsp;&nbsp;G1 X200 Y125 F600&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Scan Sweep<br/>
+                    &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=0<br/>
+                    &nbsp;&nbsp;V_DAR_SET_OFFSET VALUE=0.042
                   </div>
                 </div>
 

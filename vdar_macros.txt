@@ -40,13 +40,25 @@ gcode:
 
     M117 V-DAR: Scanning {MAT}
     G28
-    SET_PIN PIN=vdar_laser VALUE=1
+    G90
+    G1 Z5 F3000                # Move to safe scan height
+    G1 X50 Y125 F6000           # Move to start of scan line (Center-Left)
     
-    # ... Your scan path movement here ...
+    SET_PIN PIN=vdar_laser VALUE=1
+    M117 V-DAR: Laser ON
+    
+    # --- THE SCAN SWEEP ---
+    # We move slowly across the bed to let the camera/sensor pick up the laser line
+    G1 X200 Y125 F600           # Slow 10mm/s sweep to Center-Right
+    
+    SET_PIN PIN=vdar_laser VALUE=0
+    M117 V-DAR: Laser OFF
+    
+    G1 Z10 F3000               # Lift clear
+    
     # After calculation (manually or via script):
     V_DAR_SET_OFFSET VALUE=0.042 # Example value found during scan
     
-    SET_PIN PIN=vdar_laser VALUE=0
     M117 V-DAR: Scan Done
 
 # --- MATERIAL SHORTCUTS (KlipperScreen Buttons) ---
