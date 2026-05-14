@@ -114,17 +114,44 @@ To ensure V-DAR starts automatically on your printer controller:
 ## Klipper UI Integration (Manual Step)
 V-DAR does not automatically appear in your sidebar. You must add it as an external link:
 
-### Mainsail
-1. Open the **Interface Settings** modal (Gear icon in the top right).
-2. Look for **Expert Mode** (often a toggle in the top-right or bottom-left of the modal) and turn it on if it's there.
-3. Select the **NAVIGATION** or **MISCELLANEOUS** tab from the list on the left.
-4. **Scroll to the very bottom** of the right panel to find the **External Links** section.
-5. Click **+ Add Link** and set **URL** to `http://[your-printer-ip]:3000`.
-6. Enable **Open in Frame** to display it in the sidebar.
+### Mainsail Integration
+If V-DAR does not automatically appear in your sidebar, ensure the service is reachable at `http://[your-ip]:3000` in a new tab first.
+
+#### Method 1: The "Webcam" Trick (Highly Recommended)
+If the "External Links" section is missing from your interface, you can add V-DAR as a virtual webcam:
+1. Open **Settings** (Gear icon) -> **WEBCAMS**.
+2. Click **+ Add Webcam**.
+3. **Name:** `V-DAR`.
+4. **URL & Stream URL:** `http://[your-printer-ip]:3000`.
+5. **Icon:** (Optional) select a laser or tool icon.
+6. Save. V-DAR will now appear as a card on your dashboard or in the Webcams tab.
+
+#### Method 2: External Links (Standard UI)
+1. Open the **Interface Settings** modal (Gear icon).
+2. Go to the **NAVIGATION** or **MISCELLANEOUS** tab.
+3. Scroll to the **very bottom** of the right panel.
+4. If you see **External Links**, click **+ Add Link**.
+5. Set **URL** to `http://[your-printer-ip]:3000` and enable **Open in Frame**.
+
+#### KlipperScreen Warning
+**KlipperScreen** does not contain a web browser. It is mathematically impossible to display the V-DAR interface on the physical printer screen. You must use a mobile phone, tablet, or PC browser to interact with V-DAR.
+
+### "Error while connecting" in Mainsail
+If the sidebar or webcam shows a connection error:
+1. **HTTP vs HTTPS**: If your Mainsail URL is `https://...`, it will block the `http://` V-DAR window. Access Mainsail via the IP address (`http://192.168...`) instead.
+2. **Restart Service**: I've updated `vite.config.ts` to allow cross-origin framing. You must restart the service for this to take effect:
+   ```bash
+   sudo systemctl restart vdar
+   ```
 
 ### Direct Access
-If you cannot find the integration settings, you can always access V-DAR directly in any browser by visiting:
-`http://[your-printer-ip]:3000`
+If you cannot find the integration settings, or it's not working, verify the service is reachable:
+1. Open a new browser tab and go to `http://[your-printer-ip]:3000`.
+2. If it doesn't load, check if the app is bound to the correct network interface:
+   - Run `netstat -tulpn | grep :3000` in SSH.
+   - It should show `0.0.0.0:3000` (listening on all IPs).
+   - If it shows `127.0.0.1:3000`, it's only accessible from the printer itself. Ensure you haven't restricted the host in `package.json` or `vite.config.ts`.
+3. Check firewall: `sudo ufw allow 3000/tcp` (if using UFW).
 
 ## Troubleshooting
 If `http://[your-ip]:3000` does not load, or you see "Assignment outside of section":

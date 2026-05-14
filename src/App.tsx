@@ -878,26 +878,53 @@ function AboutTab() {
       <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 bg-blue-500/5">
         <h3 className="text-sm font-bold uppercase tracking-wide text-white mb-6 flex items-center gap-2">
           <LayoutDashboard className="w-4 h-4 text-blue-500" />
-          Mainsail: Still can't see "External Links"?
+          Adding V-DAR to your Sidebar
         </h3>
         <div className="space-y-6">
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-             <h4 className="text-xs font-bold text-red-400 uppercase mb-2">Check Expert Mode</h4>
-             <p className="text-[11px] text-neutral-400">
-               Some settings are hidden in Standard mode. Look for a <b className="text-white">toggle or switch</b> in the Settings header or bottom corner that says "Expert Mode" or "Advanced" and turn it on.
+          <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+             <h4 className="text-xs font-bold text-blue-400 uppercase mb-2">Option 1: The "Webcam" Trick (High Success)</h4>
+             <p className="text-[11px] text-neutral-400 leading-relaxed mb-3">
+               If you can't find "External Links", you can force V-DAR onto your dashboard by adding it as a webcam:
+             </p>
+             <ol className="text-[11px] text-neutral-500 space-y-2 list-decimal ml-4 leading-relaxed">
+                <li>Go to <b className="text-white">Settings</b> &gt; <b className="text-white">WEBCAMS</b>.</li>
+                <li>Click <b className="text-blue-400 font-bold">+ Add Webcam</b>.</li>
+                <li>Name: <code className="text-white font-mono">V-DAR</code></li>
+                <li>URL & Stream URL: <code className="text-white bg-black px-1 rounded text-[10px]">http://[printer-ip]:3000</code></li>
+                <li>Save. V-DAR will now appear as a card on your dashboard or in the Webcam tab.</li>
+             </ol>
+          </div>
+
+          <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+             <h4 className="text-xs font-bold text-orange-400 uppercase mb-2">Option 2: The "Right Way" (External Links)</h4>
+             <p className="text-[11px] text-neutral-400 leading-relaxed mb-3">
+                In <b className="text-white">Settings</b> &gt; <b className="text-white">NAVIGATION</b> (or MISCELLANEOUS):
+             </p>
+             <ol className="text-[11px] text-neutral-500 space-y-2 list-decimal ml-4">
+                <li>Scroll to the <b className="text-white">very bottom</b>.</li>
+                <li>Click <b className="text-white font-bold">+ Add Link</b>.</li>
+                <li>Toggle <b className="text-white">Open in Frame</b> to <b>ON</b>.</li>
+             </ol>
+          </div>
+
+          <div className="p-4 bg-black/50 border border-neutral-700/50 rounded-xl">
+             <h4 className="text-xs font-bold text-neutral-400 uppercase mb-2">KlipperScreen & Touch Displays</h4>
+             <p className="text-[11px] text-neutral-500 leading-relaxed">
+               <b>Warning:</b> KlipperScreen (the physical screen on your printer) does not support web browsers. V-DAR will <b>not</b> show up on that screen. You must use a phone, tablet, or PC browser.
              </p>
           </div>
 
-          <div className="space-y-4 text-sm text-neutral-400">
-            <p>Based on your screenshots, check <b className="text-white">NAVIGATION</b> or <b className="text-white">MISCELLANEOUS</b>:</p>
-            <div className="p-5 bg-neutral-800/30 border border-neutral-700/50 rounded-2xl">
-              <ol className="text-[11px] text-neutral-500 space-y-3 list-decimal ml-4">
-                <li>Click <b className="text-white">NAVIGATION</b> or <b className="text-white font-mono">DASHBOARD</b> in the list on the left.</li>
-                <li>Scroll the right panel <b className="text-white">completely to the bottom</b>.</li>
-                <li>If it's not there, try <b className="text-white font-mono">MISCELLANEOUS</b>.</li>
-                <li>If you still can't find it, your Mainsail version might be too old—please use the <b className="text-blue-400 underline">IP address:3000</b> in a new tab.</li>
-              </ol>
-            </div>
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+             <h4 className="text-xs font-bold text-red-400 uppercase mb-2">"Error while connecting"?</h4>
+             <p className="text-[11px] text-neutral-400 leading-relaxed">
+               This is usually a browser security block. Check these two things:
+             </p>
+             <ul className="text-[11px] text-neutral-500 space-y-2 list-disc ml-4 mt-2">
+                <li><b className="text-white">HTTP vs HTTPS:</b> If Mainsail is <span className="text-blue-400 font-bold">https://</span>, the browser will block V-DAR (<span className="text-blue-400">http://</span>). Use <b className="text-white">http://</b> for both.</li>
+                <li><b className="text-white">Applied Fix:</b> I've updated the server config to allow "Framing". Please <b className="text-white">restart the service</b>:
+                  <code className="block mt-1 bg-black p-1 text-blue-400">sudo systemctl restart vdar</code>
+                </li>
+             </ul>
           </div>
         </div>
       </div>
