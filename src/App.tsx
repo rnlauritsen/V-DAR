@@ -99,10 +99,18 @@ export default function App() {
                     &nbsp;&nbsp;M109 S&#123;E_TEMP&#125;<br/>
                     &nbsp;&nbsp;M190 S&#123;B_TEMP&#125;<br/>
                     <br/>
-                    &nbsp;&nbsp;G1 Z5 F3000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move to scan height<br/>
-                    &nbsp;&nbsp;G1 X50 Y125 F6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move to Start<br/>
+                    &nbsp;&nbsp;# --- PRINT SAMPLE ---<br/>
+                    &nbsp;&nbsp;G1 Z0.3 F3000<br/>
+                    &nbsp;&nbsp;G1 X50 Y125 F6000<br/>
+                    &nbsp;&nbsp;M83<br/>
+                    &nbsp;&nbsp;G1 X200 E10 F1200<br/>
+                    &nbsp;&nbsp;G1 E-1 F1800<br/>
+                    &nbsp;&nbsp;G1 Z5 F3000<br/>
+                    <br/>
+                    &nbsp;&nbsp;# --- SCAN SAMPLE ---<br/>
+                    &nbsp;&nbsp;G1 X50 Y125 F6000<br/>
                     &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=1<br/>
-                    &nbsp;&nbsp;G1 X200 Y125 F600&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Scan Sweep<br/>
+                    &nbsp;&nbsp;G1 X200 Y125 F600<br/>
                     &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=0<br/>
                     &nbsp;&nbsp;V_DAR_SET_OFFSET VALUE=0.042
                   </div>
@@ -127,16 +135,17 @@ export default function App() {
               <p className="text-neutral-400 leading-relaxed text-sm">
                 One-click material calibration. These macros pass specific temperatures to the scan engine.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 {[
                   { name: 'PLA', temp: '210/60', color: 'text-green-400' },
                   { name: 'ABS', temp: '250/110', color: 'text-red-400' },
-                  { name: 'PETG', temp: '240/80', color: 'text-blue-400' }
+                  { name: 'PETG', temp: '240/80', color: 'text-blue-400' },
+                  { name: 'RESET', temp: 'STOCK', color: 'text-neutral-400' }
                 ].map((mat) => (
                   <div key={mat.name} className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl flex flex-col items-center gap-2 group hover:border-white/20 transition-all hover:-translate-y-1">
                     <Zap className={cn("w-5 h-5", mat.color)} />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-100 italic">V_DAR_{mat.name}</span>
-                    <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-tighter">{mat.temp}°C</span>
+                    <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-tighter">{mat.temp}</span>
                   </div>
                 ))}
               </div>
