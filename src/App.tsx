@@ -81,13 +81,21 @@ export default function App() {
                 </div>
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
-                  <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">2. Laser Definition</h4>
-                  <p className="text-[12px] text-neutral-500">Explicitly mapped to your SKR Pico 2 (mcu2) Fan 2 port.</p>
-                  <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-neutral-400 border border-white/5 group-hover:border-green-500/20 transition-colors">
-                    [output_pin vdar_laser]<br/>
-                    pin: mcu2:gpio18<br/>
-                    pwm: true
-                  </pre>
+                  <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">2. Improved Scan Engine</h4>
+                  <p className="text-[12px] text-neutral-500">Universal macro that handles heating based on material parameters.</p>
+                  <div className="p-4 bg-black rounded-xl text-[10px] font-mono text-neutral-500 border border-white/5 overflow-x-auto">
+                    [gcode_macro V_DAR_SCAN]<br/>
+                    gcode:<br/>
+                    &nbsp;&nbsp;&#123;% set MAT = params.MATERIAL|default("PLA") %&#125;<br/>
+                    &nbsp;&nbsp;&#123;% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %&#125;<br/>
+                    &nbsp;&nbsp;&#123;% set B_TEMP = params.BED_TEMP|default(60)|float %&#125;<br/>
+                    <br/>
+                    &nbsp;&nbsp;M117 V-DAR: Heating &#123;MAT&#125;<br/>
+                    &nbsp;&nbsp;M104 S&#123;E_TEMP&#125;<br/>
+                    &nbsp;&nbsp;M140 S&#123;B_TEMP&#125;<br/>
+                    &nbsp;&nbsp;M109 S&#123;E_TEMP&#125;<br/>
+                    &nbsp;&nbsp;M190 S&#123;B_TEMP&#125;
+                  </div>
                 </div>
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
@@ -107,13 +115,18 @@ export default function App() {
                 <h2 className="text-2xl font-bold tracking-tight">KlipperScreen Controls</h2>
               </div>
               <p className="text-neutral-400 leading-relaxed text-sm">
-                These buttons will appear in your printer's <b>Macros</b> menu for one-click material calibration.
+                One-click material calibration. These macros pass specific temperatures to the scan engine.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {['PLA', 'ABS', 'PETG'].map((mat) => (
-                  <div key={mat} className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl flex flex-col items-center gap-3 group hover:border-white/20 transition-all hover:-translate-y-1">
-                    <Zap className={cn("w-5 h-5", mat === 'PLA' ? 'text-green-400' : mat === 'ABS' ? 'text-red-400' : 'text-blue-400')} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-100 italic">V_DAR_{mat}</span>
+                {[
+                  { name: 'PLA', temp: '210/60', color: 'text-green-400' },
+                  { name: 'ABS', temp: '250/110', color: 'text-red-400' },
+                  { name: 'PETG', temp: '240/80', color: 'text-blue-400' }
+                ].map((mat) => (
+                  <div key={mat.name} className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl flex flex-col items-center gap-2 group hover:border-white/20 transition-all hover:-translate-y-1">
+                    <Zap className={cn("w-5 h-5", mat.color)} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-100 italic">V_DAR_{mat.name}</span>
+                    <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-tighter">{mat.temp}°C</span>
                   </div>
                 ))}
               </div>

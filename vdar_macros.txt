@@ -29,6 +29,15 @@ gcode:
 description: Base macro for V-DAR scanning
 gcode:
     {% set MAT = params.MATERIAL|default("PLA") %}
+    {% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %}
+    {% set B_TEMP = params.BED_TEMP|default(60)|float %}
+
+    M117 V-DAR: Heating {MAT}
+    M104 S{E_TEMP}
+    M140 S{B_TEMP}
+    M109 S{E_TEMP}
+    M190 S{B_TEMP}
+
     M117 V-DAR: Scanning {MAT}
     G28
     SET_PIN PIN=vdar_laser VALUE=1
@@ -45,17 +54,17 @@ gcode:
 [gcode_macro V_DAR_PLA]
 description: Quick PLA Scan
 gcode:
-    V_DAR_SCAN MATERIAL="PLA"
+    V_DAR_SCAN MATERIAL="PLA" EXTRUDER_TEMP=210 BED_TEMP=60
 
 [gcode_macro V_DAR_ABS]
 description: Quick ABS Scan
 gcode:
-    V_DAR_SCAN MATERIAL="ABS"
+    V_DAR_SCAN MATERIAL="ABS" EXTRUDER_TEMP=250 BED_TEMP=110
 
 [gcode_macro V_DAR_PETG]
 description: Quick PETG Scan
 gcode:
-    V_DAR_SCAN MATERIAL="PETG"
+    V_DAR_SCAN MATERIAL="PETG" EXTRUDER_TEMP=240 BED_TEMP=80
 
 # 5. INTEGRATION IN PRINT_START
 # Use this in your printer.cfg to merge your heating logic with V-DAR
