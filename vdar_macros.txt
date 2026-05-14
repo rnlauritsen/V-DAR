@@ -1,8 +1,9 @@
 #####################################################################
-# V-DAR: Optimized for your 2.4 setup (2x SKR PICO)
+# V-DAR: Material-Specific Macros
 #####################################################################
 
 # 1. THE "STORAGE" CONFIG
+# Add this to your config to allow saving variables to disk
 [save_variables]
 filename: ~/printer_data/config/variables.cfg
 
@@ -15,6 +16,7 @@ value: 0
 shutdown_value: 0
 
 # 3. THE PERSISTENCE MACRO
+# This saves the calculated value to the variables.cfg file
 [gcode_macro V_DAR_SET_OFFSET]
 description: Saves the calibration value across reboots
 gcode:
@@ -38,7 +40,24 @@ gcode:
     SET_PIN PIN=vdar_laser VALUE=0
     M117 V-DAR: Scan Done
 
-# 5. RECOMMENDED PRINT_START
+# --- MATERIAL SHORTCUTS (KlipperScreen Buttons) ---
+
+[gcode_macro V_DAR_PLA]
+description: Quick PLA Scan
+gcode:
+    V_DAR_SCAN MATERIAL="PLA"
+
+[gcode_macro V_DAR_ABS]
+description: Quick ABS Scan
+gcode:
+    V_DAR_SCAN MATERIAL="ABS"
+
+[gcode_macro V_DAR_PETG]
+description: Quick PETG Scan
+gcode:
+    V_DAR_SCAN MATERIAL="PETG"
+
+# 5. INTEGRATION IN PRINT_START
 # Use this in your printer.cfg to merge your heating logic with V-DAR
 [gcode_macro PRINT_START]
 gcode:

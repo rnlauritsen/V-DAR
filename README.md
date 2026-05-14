@@ -39,26 +39,11 @@ npm run dev
 The interface will be available at `http://localhost:3000`.
 
 ### Klipper Configuration
-To "enable" the hardware, add this to your `printer.cfg`:
+To "enable" the hardware, follow the instructions in the **Klipper Macros** tab of the V-DAR interface or use the [vdar_macros.txt](./vdar_macros.txt) file.
 
-1. **Laser Definition:**
-   ```ini
-   [output_pin vdar_laser]
-   pin: mcu2:gpio18  # Explicitly configured for your SKR Pico 2
-   pwm: true
-   value: 0
-   shutdown_value: 0
-   ```
-
-2. **Scan Macro:**
-   ```ini
-   [gcode_macro V_DAR_SCAN]
-   gcode:
-       SET_PIN PIN=vdar_laser VALUE=1
-       M117 Scanning...
-       # Your scan routine here
-       SET_PIN PIN=vdar_laser VALUE=0
-   ```
+1. **Laser Definition:** Use `mcu2:gpio18` for your SKR Pico 2 setup.
+2. **Persistence:** Add `[save_variables]` to your config to preserve results.
+3. **Integration:** Update your `PRINT_START` to auto-load the offsets.
 
 ## Installation Success
 Your V-DAR service is now running. You can access the interface at:
@@ -111,48 +96,21 @@ To ensure V-DAR starts automatically on your printer controller:
    sudo systemctl start vdar
    ```
 
-## Hardware Compatibility
-V-DAR is designed to be non-intrusive:
-- **Extruder Config:** You do **not** need to change your `[extruder]` settings. Everything from `rotation_distance` to `pressure_advance` remains untouched.
-- **Probe/Z-Offset:** V-DAR uses `Z_ADJUST`, which is additive. It shifts your nozzle height based on the material without overwriting your primary probe calibration.
+## Quick Start Guide
 
-## Smart Persistence (CNC-Style)
-V-DAR supports **Smart Persistence**, which saves calibration results to a file (`variables.cfg`) so they are preserved across reboots.
+### 1. Klipper Config (Persistence & Macros)
+Download [vdar_macros.txt](./vdar_macros.txt) and copy it into your `printer.cfg`. This enables:
+- **Smart Persistence:** Results are saved to `variables.cfg` and reloaded on reboot.
+- **CNC-Style Offsets:** Your `PRINT_START` will automatically apply the last scan.
+- **KlipperScreen Buttons:** Quick access to `V_DAR_PLA`, `V_DAR_ABS`, and `V_DAR_PETG`.
 
-1. **Setup Storage:** Add `[save_variables]` to your config:
-   ```ini
-   [save_variables]
-   filename: ~/printer_data/config/variables.cfg
-   ```
-2. **Auto-Load:** Add this logic inside your `[gcode_macro PRINT_START]`:
-   ```gcode
-   # Inside your PRINT_START macro:
-   {% set vdar_o = printer.save_variables.variables.vdar_last_offset|default(0.0) %}
-   SET_GCODE_OFFSET Z_ADJUST={vdar_o} MOVE=1
-   ```
-
-## Macro-First Workflow (KlipperScreen & OctoEverywhere)
-Because KlipperScreen and OctoEverywhere have limited browser support, V-DAR is best operated via **Klipper Macros**. This allows you to trigger scans directly from your printer's physical screen.
-
-### 1. Download the Macros
-Download [vdar_macros.txt](./vdar_macros.txt) and copy the contents into your `printer.cfg`.
-
-### 2. Available Macros
-Once added, these will appear in your **Macros** menu:
-- `V_DAR_PLA`: Optimized for standard filament.
-- `V_DAR_ABS`: Optimized for high-temperature material.
-- `V_DAR_PETG`: Optimized for specific adhesion parameters.
-
-### 3. Usage
-Simply click the button for the material you are using. The results will be logged to the console, and you can still view the graphical data at:
-`http://[your-printer-ip]:3000`
-
----
-
-## Service Installation
-To ensure V-DAR starts on boot:
+### 2. Service Installation
+To run the V-DAR web interface on boot:
 1. SSH into your printer.
-2. Follow the steps in the **Klipper Macros** tab in the web interface to create the `vdar.service` file.
+2. Follow the automated steps in the **Klipper Macros** tab of the web interface to install the systemd daemon.
+
+### 3. Hardware Compatibility
+V-DAR is designed to be non-intrusive. It does **not** conflict with your `[extruder]` settings or your primary `[probe]` Z-offset. It uses additive `Z_ADJUST` to fine-tune the first layer based on material behavior.
 
 ### Direct Access
 If you cannot find the integration settings, or it's not working, verify the service is reachable:
