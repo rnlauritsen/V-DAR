@@ -32,15 +32,16 @@ gcode:
     {% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %}
     {% set B_TEMP = params.BED_TEMP|default(60)|float %}
 
+    M117 V-DAR: Scanning {MAT}
+    G28
+    G90
+    
     M117 V-DAR: Heating {MAT}
     M104 S{E_TEMP}
     M140 S{B_TEMP}
     M109 S{E_TEMP}
     M190 S{B_TEMP}
 
-    M117 V-DAR: Scanning {MAT}
-    G28
-    G90
     G1 Z5 F3000                # Move to safe scan height
     G1 X50 Y125 F6000           # Move to start of scan line (Center-Left)
     

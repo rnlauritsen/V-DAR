@@ -90,14 +90,15 @@ export default function App() {
                     &nbsp;&nbsp;&#123;% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %&#125;<br/>
                     &nbsp;&nbsp;&#123;% set B_TEMP = params.BED_TEMP|default(60)|float %&#125;<br/>
                     <br/>
+                    &nbsp;&nbsp;G28<br/>
+                    &nbsp;&nbsp;G90<br/>
+                    <br/>
                     &nbsp;&nbsp;M117 V-DAR: Heating &#123;MAT&#125;<br/>
                     &nbsp;&nbsp;M104 S&#123;E_TEMP&#125;<br/>
                     &nbsp;&nbsp;M140 S&#123;B_TEMP&#125;<br/>
                     &nbsp;&nbsp;M109 S&#123;E_TEMP&#125;<br/>
                     &nbsp;&nbsp;M190 S&#123;B_TEMP&#125;<br/>
                     <br/>
-                    &nbsp;&nbsp;G28<br/>
-                    &nbsp;&nbsp;G90<br/>
                     &nbsp;&nbsp;G1 Z5 F3000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move to scan height<br/>
                     &nbsp;&nbsp;G1 X50 Y125 F6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Move to Start<br/>
                     &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=1<br/>
