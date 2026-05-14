@@ -2,27 +2,33 @@
 # V-DAR: Material-Specific Macros
 #####################################################################
 
-# 1. THE "STORAGE" CONFIG
-# Add this to your config to allow saving variables to disk
+# 1. THE HARDWARE CONFIG
+# Edit these values to match your specific printer setup
+[gcode_macro V_DAR_CONFIG]
+variable_nozzle_size: 0.6    # Diameter of your nozzle (e.g. 0.4, 0.6, 0.8)
+gcode:
+    # This block is for configuration storage only
+
+# 2. THE "STORAGE" CONFIG
 [save_variables]
 filename: ~/printer_data/config/variables.cfg
 
-# 2. THE HARDWARE CONFIG
+# 3. THE LASER PIN CONFIG
 [output_pin vdar_laser]
 pin: mcu2:gpio18
 pwm: true
 value: 0
 shutdown_value: 0
-# nozzle_diameter: 0.6     # Read automatically from [extruder]
 
-# 3. THE BASE SCAN ENGINE
+# 4. THE BASE SCAN ENGINE
 [gcode_macro V_DAR_SCAN]
 description: Base macro for V-DAR scanning
 gcode:
+    {% set conf = printer["gcode_macro V_DAR_CONFIG"] %}
     {% set MAT = params.MATERIAL|default("PLA") %}
     {% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %}
     {% set B_TEMP = params.BED_TEMP|default(60)|float %}
-    {% set NOZZLE = printer.configfile.settings.extruder.nozzle_diameter %}
+    {% set NOZZLE = params.NOZZLE_SIZE|default(conf.nozzle_size)|float %}
     {% set PA = params.PRESSURE_ADVANCE|default(0.0)|float %}
     {% set PA_ST = params.SMOOTH_TIME|default(0.04)|float %}
 

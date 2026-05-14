@@ -70,16 +70,17 @@ export default function App() {
               <div className="space-y-4">
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">1. Hardware Setup</h4>
-                    <span className="text-[10px] bg-white/5 text-white/40 px-2 py-0.5 rounded-full border border-white/10 uppercase font-bold tracking-tighter italic">Essential</span>
+                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">1. Hardware Configuration</h4>
+                    <span className="text-[10px] bg-white/5 text-white/40 px-2 py-0.5 rounded-full border border-white/10 uppercase font-bold tracking-tighter italic">Edit Here</span>
                   </div>
-                  <p className="text-[12px] text-neutral-500">Configure your laser pin and verify your nozzle diameter in <code className="text-white">printer.cfg</code>.</p>
+                  <p className="text-[12px] text-neutral-500">Set your nozzle diameter here. This informs the scan engine's extrusion volume.</p>
                   <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-neutral-400 border border-white/5 group-hover:border-white/20 transition-colors">
+                    [gcode_macro V_DAR_CONFIG]<br/>
+                    <span className="text-blue-400 font-bold">variable_nozzle_size: 0.6</span><br/>
+                    gcode:<br/>
+                    <br/>
                     [output_pin vdar_laser]<br/>
-                    pin: mcu2:gpio18<br/>
-                    pwm: true<br/>
-                    <span className="text-blue-400 font-bold">nozzle_diameter: 0.6</span><br/>
-                    <span className="text-neutral-600 italic"># (Note: nozzle size is pulled from [extruder])</span>
+                    pin: mcu2:gpio18
                   </pre>
                 </div>
 
@@ -97,46 +98,13 @@ export default function App() {
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
                   <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">3. Improved Scan Engine</h4>
-                  <p className="text-[12px] text-neutral-500">The engine now automatically reads <code className="text-white">nozzle_diameter</code> from your <code className="text-white">[extruder]</code> config. No manual setting needed.</p>
+                  <p className="text-[12px] text-neutral-500">The engine pulls parameters from your hardware configuration block.</p>
                   <div className="p-4 bg-black rounded-xl text-[10px] font-mono text-neutral-500 border border-white/5 overflow-x-auto">
                     [gcode_macro V_DAR_SCAN]<br/>
                     gcode:<br/>
+                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">&#123;% set conf = printer["gcode_macro V_DAR_CONFIG"] %&#125;</span><br/>
                     &nbsp;&nbsp;&#123;% set MAT = params.MATERIAL|default("PLA") %&#125;<br/>
-                    &nbsp;&nbsp;&#123;% set E_TEMP = params.EXTRUDER_TEMP|default(200)|float %&#125;<br/>
-                    &nbsp;&nbsp;&#123;% set B_TEMP = params.BED_TEMP|default(60)|float %&#125;<br/>
-                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">&#123;% set NOZZLE = printer.configfile.settings.extruder.nozzle_diameter %&#125;</span><br/>
-                    &nbsp;&nbsp;&#123;% set PA = params.PRESSURE_ADVANCE|default(0.0)|float %&#125;<br/>
-                    <br/>
-                    &nbsp;&nbsp;G28<br/>
-                    &nbsp;&nbsp;G90<br/>
-                    <br/>
-                    &nbsp;&nbsp;SET_PRESSURE_ADVANCE ADVANCE=&#123;PA&#125;<br/>
-                    <br/>
-                    &nbsp;&nbsp;M117 V-DAR: Heating &#123;MAT&#125;<br/>
-                    &nbsp;&nbsp;M104 S&#123;E_TEMP&#125;<br/>
-                    &nbsp;&nbsp;M140 S&#123;B_TEMP&#125;<br/>
-                    &nbsp;&nbsp;M109 S&#123;E_TEMP&#125;<br/>
-                    &nbsp;&nbsp;M190 S&#123;B_TEMP&#125;<br/>
-                    <br/>
-                    &nbsp;&nbsp;# --- PRINT SAMPLE ---<br/>
-                    &nbsp;&nbsp;G1 Z0.3 F3000<br/>
-                    &nbsp;&nbsp;G1 X50 Y125 F6000<br/>
-                    &nbsp;&nbsp;M83<br/>
-                    &nbsp;&nbsp;&#123;% set ext = (10.0 * (NOZZLE / 0.4)) %&#125;<br/>
-                    &nbsp;&nbsp;G1 X200 E&#123;ext&#125; F1200<br/>
-                    &nbsp;&nbsp;G1 E-1 F1800&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Retract 1mm<br/>
-                    <br/>
-                    &nbsp;&nbsp;# --- COOLDOWN ---<br/>
-                    &nbsp;&nbsp;M104 S0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Off to prevent ooze<br/>
-                    &nbsp;&nbsp;G4 P2000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Wait for pressure<br/>
-                    &nbsp;&nbsp;G1 Z5 F3000<br/>
-                    <br/>
-                    &nbsp;&nbsp;# --- SCAN SAMPLE ---<br/>
-                    &nbsp;&nbsp;G1 X50 Y125 F6000<br/>
-                    &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=1<br/>
-                    &nbsp;&nbsp;G1 X200 Y125 F600<br/>
-                    &nbsp;&nbsp;SET_PIN PIN=vdar_laser VALUE=0<br/>
-                    &nbsp;&nbsp;M118 V-DAR: Waiting for service analysis...
+                    &nbsp;&nbsp;&#123;% set NOZZLE = params.NOZZLE_SIZE|default(conf.nozzle_size)|float %&#125;
                   </div>
                 </div>
 
