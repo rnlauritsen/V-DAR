@@ -1,5 +1,13 @@
 # V-DAR: Voron LIDAR System
 
+! THIS IS STILL IN DEVELOPMENT !
+
+- BOM -
+
+Aopick Endoscope Camera - 21euro
+
+Focusable Red Line Laser - 20euro
+
 V-DAR is a sub-pixel accurate LIDAR calibration system for Klipper-based 3D printers (optimized for Voron 2.4). It uses a standard line laser and UVC endoscope to automate flowrate and pressure advance calibration.
 
 ## Features
