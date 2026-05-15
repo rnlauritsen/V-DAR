@@ -73,10 +73,11 @@ export default function App() {
                     <h4 className="text-xs font-bold text-white uppercase tracking-widest">1. Hardware Configuration</h4>
                     <span className="text-[10px] bg-white/5 text-white/40 px-2 py-0.5 rounded-full border border-white/10 uppercase font-bold tracking-tighter italic">Edit Here</span>
                   </div>
-                  <p className="text-[12px] text-neutral-500">Set your nozzle diameter here. This informs the scan engine's extrusion volume.</p>
+                  <p className="text-[12px] text-neutral-500">Configure your hardware parameters. Lower <code className="text-white">scan_speed</code> if your camera has a low FPS.</p>
                   <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-neutral-400 border border-white/5 group-hover:border-white/20 transition-colors">
                     [gcode_macro V_DAR_CONFIG]<br/>
-                    <span className="text-blue-400 font-bold">variable_nozzle_size: 0.6</span><br/>
+                    variable_nozzle_size: 0.6<br/>
+                    <span className="text-blue-400 font-bold">variable_scan_speed: 300</span> <span className="text-neutral-700 italic"># (Lower if camera is slow)</span><br/>
                     gcode:<br/>
                     <br/>
                     [output_pin vdar_laser]<br/>
@@ -97,21 +98,17 @@ export default function App() {
                 </div>
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
-                  <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">3. Scan Pattern (Rubedo Model)</h4>
-                  <p className="text-[12px] text-neutral-500 italic">Prints a series of lines with speed transitions (Slow-Fast-Slow) to accurately map extrusion bulges and pressure advance lag.</p>
-                  <div className="p-4 bg-black rounded-xl text-[10px] font-mono text-neutral-500 border border-white/5 overflow-x-auto">
-                    [gcode_macro V_DAR_SCAN]<br/>
-                    gcode:<br/>
-                    &nbsp;&nbsp;<span className="text-blue-400 font-bold">&#123;% set conf = printer["gcode_macro V_DAR_CONFIG"] %&#125;</span><br/>
-                    &nbsp;&nbsp;&#123;% set MAT = params.MATERIAL|default("PLA") %&#125;<br/>
-                    &nbsp;&nbsp;&#123;% set NOZZLE = params.NOZZLE_SIZE|default(conf.nozzle_size)|float %&#125;<br/>
-                    <br/>
-                    &nbsp;&nbsp;# Printing 10 lines with F600 → F9000 transitions<br/>
-                    &nbsp;&nbsp;&#123;% for i in range(10) %&#125;<br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;G1 X100 E&#123;2.5 * (NOZZLE/0.4)&#125; F600<br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;G1 X150 E&#123;2.5 * (NOZZLE/0.4)&#125; <span className="text-white">F9000</span><br/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;G1 X200 E&#123;2.5 * (NOZZLE/0.4)&#125; F600<br/>
-                    &nbsp;&nbsp;&#123;% endfor %&#125;
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">3. Scan Pattern & Sweeps</h4>
+                    <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded-full border border-green-500/20 uppercase font-bold tracking-tighter">Segmented Sweep</span>
+                  </div>
+                  <p className="text-[12px] text-neutral-500 italic">Prints 10 lines. Scanning is divided into <b>4 distinct Y-sweeps</b> (2-3-2-3 lines) to ensure reliable capture on cameras with narrow FOV.</p>
+                  <div className="p-4 bg-black rounded-xl text-[10px] font-mono text-neutral-400 border border-white/5 overflow-x-auto leading-relaxed">
+                    <span className="text-blue-400"># Segmented Sweep Strategy (X125)</span><br/>
+                    1. Sweep Forward (L1-L2)<br/>
+                    2. Sweep Backward (L3-L5)<br/>
+                    3. Sweep Forward (L6-L7)<br/>
+                    4. Sweep Backward (L8-L10)
                   </div>
                 </div>
 
