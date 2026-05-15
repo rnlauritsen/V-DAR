@@ -1,6 +1,8 @@
 # V-DAR: Voron LIDAR System
 
-! THIS IS STILL IN DEVELOPMENT !
+## **! THIS IS STILL IN DEVELOPMENT !**
+
+![V-DAR Scanner Unit](./vdar_toolhead.png)
 
 - BOM -
 
