@@ -2,6 +2,8 @@
 
 ! THIS IS STILL IN DEVELOPMENT !
 
+<img width="833" height="783" alt="Skærmbillede 2026-05-15 102907" src="https://github.com/user-attachments/assets/96533dc7-3eea-40c6-9dd5-63a0a72ecb7f" />
+
 - BOM -
 
 Aopick Endoscope Camera - 21euro
