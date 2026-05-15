@@ -97,14 +97,21 @@ export default function App() {
                 </div>
 
                 <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-3xl space-y-4 hover:border-neutral-700 transition-colors group">
-                  <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">3. Improved Scan Engine</h4>
-                  <p className="text-[12px] text-neutral-500">The engine pulls parameters from your hardware configuration block.</p>
+                  <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest">3. Scan Pattern (Rubedo Model)</h4>
+                  <p className="text-[12px] text-neutral-500 italic">Prints a series of lines with speed transitions (Slow-Fast-Slow) to accurately map extrusion bulges and pressure advance lag.</p>
                   <div className="p-4 bg-black rounded-xl text-[10px] font-mono text-neutral-500 border border-white/5 overflow-x-auto">
                     [gcode_macro V_DAR_SCAN]<br/>
                     gcode:<br/>
                     &nbsp;&nbsp;<span className="text-blue-400 font-bold">&#123;% set conf = printer["gcode_macro V_DAR_CONFIG"] %&#125;</span><br/>
                     &nbsp;&nbsp;&#123;% set MAT = params.MATERIAL|default("PLA") %&#125;<br/>
-                    &nbsp;&nbsp;&#123;% set NOZZLE = params.NOZZLE_SIZE|default(conf.nozzle_size)|float %&#125;
+                    &nbsp;&nbsp;&#123;% set NOZZLE = params.NOZZLE_SIZE|default(conf.nozzle_size)|float %&#125;<br/>
+                    <br/>
+                    &nbsp;&nbsp;# Printing 10 lines with F600 → F9000 transitions<br/>
+                    &nbsp;&nbsp;&#123;% for i in range(10) %&#125;<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;G1 X100 E&#123;2.5 * (NOZZLE/0.4)&#125; F600<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;G1 X150 E&#123;2.5 * (NOZZLE/0.4)&#125; <span className="text-white">F9000</span><br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;G1 X200 E&#123;2.5 * (NOZZLE/0.4)&#125; F600<br/>
+                    &nbsp;&nbsp;&#123;% endfor %&#125;
                   </div>
                 </div>
 

@@ -45,17 +45,28 @@ gcode:
     M109 S{E_TEMP}
     M190 S{B_TEMP}
 
-    # --- STEP 1: PRINT SAMPLE LINE ---
-    M117 V-DAR: Printing Sample
+    # --- STEP 1: PRINT CALIBRATION PATTERN (RUBEDO STYLE) ---
+    M117 V-DAR: Printing Pattern
     G1 Z0.3 F3000                # Go to print height
-    G1 X50 Y125 F6000            # Move to start
     M83                          # Relative extrusion
     
-    # Calculate extrusion based on nozzle size (simplified volume check)
-    # 0.4mm nozzle = E10, 0.6mm nozzle = E15 approx for similar density
-    {% set ext_amount = (10.0 * (NOZZLE / 0.4)) %}
-    G1 X200 E{ext_amount} F1200  # Extrude test line
-    G1 E-1 F1800                 # Retract 1mm to prevent ooze
+    # We print a series of lines with speed transitions to test flow/PA
+    {% set start_x = 50 %}
+    {% set end_x = 200 %}
+    {% set start_y = 110 %}
+    {% set line_spacing = 3 %}
+    {% set num_lines = 10 %}
+    
+    {% for i in range(num_lines) %}
+        {% set curr_y = start_y + (i * line_spacing) %}
+        G1 X{start_x} Y{curr_y} F6000            # Move to start of line
+        G1 X100 E{2.5 * (NOZZLE/0.4)} F600       # Slow (6mm/s)
+        G1 X150 E{2.5 * (NOZZLE/0.4)} F9000      # Fast (150mm/s) - Pressure test
+        G1 X200 E{2.5 * (NOZZLE/0.4)} F600       # Slow (6mm/s)
+        G1 E-0.5 F1800                          # Small retract between lines
+    {% endfor %}
+    
+    G1 E-0.5 F1800               # Final retract to prevent ooze
     
     # --- STEP 2: COOLDOWN (PREVENT CONTAMINATION) ---
     M117 V-DAR: Cooling Down...
@@ -65,12 +76,13 @@ gcode:
     G1 Z5 F3000                  # Lift clear for laser
 
     # --- STEP 3: LASER SCAN SWEEP ---
-    M117 V-DAR: Scanning Sample
-    G1 X50 Y125 F6000            # Back to start of line
+    M117 V-DAR: Scanning Pattern
+    # Sweep across a representative middle section of the pattern
+    G1 X125 Y{start_y - 10} F6000 # Position for Y-sweep
     SET_PIN PIN=vdar_laser VALUE=1
     
-    # We move slowly across the line
-    G1 X200 Y125 F600            # Slow sweep (10mm/s)
+    # We sweep across all lines to capture the full pattern profile
+    G1 Y{start_y + (num_lines * line_spacing) + 10} F300 # Slow Y-sweep (5mm/s)
     
     SET_PIN PIN=vdar_laser VALUE=0
     G1 Z10 F3000                 # Lift clear
