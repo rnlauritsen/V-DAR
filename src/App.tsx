@@ -77,7 +77,10 @@ export default function App() {
                   <pre className="p-4 bg-black rounded-xl text-[11px] font-mono text-neutral-400 border border-white/5 group-hover:border-white/20 transition-colors">
                     [gcode_macro V_DAR_CONFIG]<br/>
                     variable_nozzle_size: 0.6<br/>
-                    <span className="text-blue-400 font-bold">variable_scan_speed: 300</span> <span className="text-neutral-700 italic"># (Lower if camera is slow)</span><br/>
+                    variable_scan_speed: 300<br/>
+                    <span className="text-blue-400 font-bold">variable_scan_height: 5.0</span> <span className="text-neutral-700 italic"># (Height above bed)</span><br/>
+                    variable_camera_offset_x: -24.85<br/>
+                    variable_camera_offset_y: -70.85<br/>
                     gcode:<br/>
                     <br/>
                     [output_pin vdar_laser]<br/>
